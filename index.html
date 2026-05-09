@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Trắc Nghiệm Tư Tưởng Hồ Chí Minh</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f0ebe3;
+    color: #2c1810;
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+
+  /* HEADER */
+  .topbar {
+    background: #b71c1c;
+    color: #fff;
+    padding: 12px 16px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 17px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  }
+
+  /* INTRO */
+  .intro {
+    max-width: 600px;
+    margin: 24px auto;
+    padding: 0 16px;
+    text-align: center;
+  }
+  .intro h2 { color: #b71c1c; font-size: 22px; margin-bottom: 8px; }
+  .intro p { color: #5d4037; margin-bottom: 16px; line-height: 1.5; }
+  .info-list {
+    background: #fff;
+    border-radius: 10px;
+    padding: 16px;
+    text-align: left;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+  .info-list li { padding: 6px 0; color: #5d4037; font-size: 15px; }
+
+  .big-btn {
+    display: block;
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+    padding: 16px 0;
+    background: #c62828;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: center;
+    box-shadow: 0 3px 10px rgba(198,40,40,0.3);
+    -webkit-appearance: none;
+  }
+  .big-btn:active { background: #8e0000; transform: scale(0.97); }
+
+  .hidden { display: none !important; }
+
+  /* QUIZ */
+  .quiz-area { max-width: 700px; margin: 0 auto; padding: 0 12px; }
+
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    position: sticky;
+    top: 48px;
+    z-index: 9;
+  }
+  .status-bar .bar {
+    flex: 1;
+    height: 6px;
+    background: #e0e0e0;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .status-bar .bar-fill {
+    height: 100%;
+    background: #c62828;
+    border-radius: 3px;
+    transition: width 0.3s;
+  }
+
+  .q-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    border-left: 4px solid #c62828;
+  }
+  .q-num { font-size: 13px; color: #c62828; font-weight: 700; margin-bottom: 6px; }
+  .q-text { font-size: 16px; line-height: 1.5; margin-bottom: 12px; }
+
+  .opt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    margin-bottom: 6px;
+    border: 2px solid #d7ccc8;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #fafafa;
+    transition: background 0.15s;
+  }
+  .opt:active { background: #f5f5f5; }
+
+  .opt .letter {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+  .opt.chosen { border-color: #c62828; background: #ffebee; }
+  .opt.chosen .letter { background: #c62828; color: #fff; }
+  .opt.right { border-color: #2e7d32; background: #e8f5e9; }
+  .opt.right .letter { background: #2e7d32; color: #fff; }
+  .opt.wrong { border-color: #c62828; background: #ffebee; }
+  .opt.wrong .letter { background: #c62828; color: #fff; }
+
+  .nav-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    background: #fff;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+  .nav-dot {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 2px solid #d7ccc8;
+    background: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .nav-dot.done { background: #c62828; color: #fff; border-color: #c62828; }
+
+  .bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    padding: 10px 16px;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+  }
+  .bottom-bar button {
+    width: 100%;
+    max-width: 400px;
+    padding: 14px 0;
+    background: #c62828;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    -webkit-appearance: none;
+  }
+  .bottom-bar button:active { background: #8e0000; }
+  .bottom-bar button:disabled { background: #bdbdbd; }
+
+  /* RESULTS */
+  .result-area { max-width: 600px; margin: 0 auto; padding: 0 16px; }
+  .score-box {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .score-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    color: #fff;
+    font-weight: 700;
+  }
+  .score-circle.ok { background: #2e7d32; }
+  .score-circle.not { background: #c62828; }
+  .score-num { font-size: 40px; }
+  .score-tag { font-size: 14px; }
+
+  .stat-row { display: flex; justify-content: center; gap: 30px; margin: 16px 0; }
+  .stat { text-align: center; }
+  .stat .val { font-size: 24px; font-weight: 700; }
+  .stat .val.green { color: #2e7d32; }
+  .stat .val.red { color: #c62828; }
+  .stat .lbl { font-size: 13px; color: #5d4037; }
+
+  .review {
+    background: #fff;
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .review.good { border-left: 4px solid #2e7d32; }
+  .review.bad { border-left: 4px solid #c62828; }
+  .review .rq { font-weight: 600; margin-bottom: 4px; font-size: 15px; }
+  .review .ra { font-size: 14px; color: #5d4037; }
+  .review .rc { font-size: 14px; color: #2e7d32; font-weight: 600; }
+
+  .btn-row { display: flex; gap: 10px; margin-top: 20px; justify-content: center; flex-wrap: wrap; }
+  .btn-row button {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    -webkit-appearance: none;
+  }
+  .btn-row .btn-red { background: #c62828; color: #fff; }
+  .btn-row .btn-out { background: #fff; color: #c62828; border: 2px solid #c62828; }
+  .btn-row button:active { transform: scale(0.96); }
+
+  .loading {
+    text-align: center;
+    padding: 60px 20px;
+    font-size: 16px;
+    color: #5d4037;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">★ Trắc Nghiệm Tư Tưởng Hồ Chí Minh</div>
+
+<!-- INTRO -->
+<div id="pageIntro">
+  <div class="intro">
+    <h2>📚 Tư Tưởng Hồ Chí Minh</h2>
+    <p>Trắc nghiệm kiến thức 60 câu — ngẫu nhiên mỗi lần làm</p>
+    <div class="info-list">
+      <ul>
+        <li>✅ 60 câu trắc nghiệm, 4 đáp án/câu</li>
+        <li>✅ Mỗi lần mở là bộ câu hỏi khác nhau</li>
+        <li>✅ Biết điểm ngay sau khi nộp bài</li>
+        <li>✅ Xem lại chi tiết từng câu đúng/sai</li>
+      </ul>
+    </div>
+    <button class="big-btn" id="btnStart">BẮT ĐẦU LÀM BÀI</button>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div id="pageQuiz" class="hidden">
+  <div class="quiz-area">
+    <div class="status-bar">
+      <span id="lblCount">Đã làm: 0/60</span>
+      <div class="bar"><div class="bar-fill" id="barFill" style="width:0%"></div></div>
+      <span id="lblTime">⏱ 60:00</span>
+    </div>
+    <div class="nav-strip" id="navStrip"></div>
+    <div id="qList"></div>
+  </div>
+  <div class="bottom-bar">
+    <button id="btnSubmit">📝 NỘP BÀI</button>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="pageResult" class="hidden">
+  <div class="result-area" id="resultContent"></div>
+  <div class="btn-row" style="margin:20px 0 40px">
+    <button class="btn-red" id="btnRetake">🔄 LÀM LẠI</button>
+    <button class="btn-out" id="btnPrint">🖨 IN</button>
+  </div>
+</div>
+
+
+<script>
+var QUESTIONS_DATA = [{"c":"1","q":"Đâu là nhận định chính xác nhất khi nói về tư tưởng Hồ Chí Minh?","a":"Hồ Chí Minh là người đã nắm bắt chính xác xu hướng phát triển của thời đại để tìm ra con đường cách mạng đúng đắn cho dân tộc Việt Nam."},{"c":"1","q":"Theo quan điểm của Đảng Cộng sản Việt Nam nội dung cốt lõi của tư tưởng Hồ Chí Minh là gì?","a":"Độc lập dân tộc gắn liền với chủ nghĩa xã hội."},{"c":"1","q":"Thuật ngữ \"Tư tưởng Hồ Chí Minh\" được Đảng Cộng sản Việt Nam chính thức sử dụng từ năm nào?","a":"1991"},{"c":"1","q":"Đại hội Đảng toàn quốc lần thứ mấy khẳng định: \"Đảng lấy Chủ nghĩa Mác – Lênin, tư tưởng Hồ Chí Minh làm nền tảng tư tưởng, kim chỉ nam cho hành động\"?","a":"VII"},{"c":"1","q":"Tính Đảng trong nghiên cứu tư tưởng Hồ Chí Minh được hiểu là phải đứng trên lập trường của giai cấp nào?","a":"Giai cấp công nhân."},{"c":"1","q":"Nghiên cứu, học tập tư tưởng Hồ Chí Minh giúp cho sinh viên điều gì?","a":"Vận dụng, rèn luyện phương pháp và phong cách công tác."},{"c":"1","q":"Trong nghiên cứu tư tưởng Hồ Chí Minh, chúng ta cần sử dụng phương pháp nào để nghiên cứu sự vật, hiện tượng theo trình tự thời gian?","a":"Logic và lịch sử."},{"c":"1","q":"Để không mắc phải \"lý luận suông\" trong phương pháp luận nghiên cứu tư tưởng Hồ Chí Minh, chúng ta cần phải thống nhất","a":"Lý luận và thực tiễn."},{"c":"1","q":"Để đảm bảo tính bao quát trong phương pháp luận nghiên cứu tư tưởng Hồ Chí Minh, chúng ta cần phải thống nhất","a":"Tính đảng và tính khoa học."},{"c":"1","q":"\"Toàn Đảng, toàn dân ta đoàn kết phấn đấu, xây dựng một nước Việt Nam hoà bình, thống nhất, độc lập, dân chủ và giàu mạnh...\" Đoạn trích trên trong tác phẩm nào của Chủ tịch Hồ Chí Minh?","a":"Di chúc."},{"c":"1","q":"Chỉ thị 05 của Bộ Chính trị về \"Đẩy mạnh học tập và làm theo tư tưởng, đạo đức, phong cách Hồ Chí Minh\" xác định đối tượng nào sẽ học tập và làm theo?","a":"Toàn Đảng, toàn dân, toàn quân."},{"c":"2","q":"Hồ Chí Minh đánh giá cuộc cách mạng nào đã \"mở ra trước mắt họ thời đại cách mạng chống đế quốc, thời đại giải phóng dân tộc\"?","a":"Cách mạng Tháng Mười Nga."},{"c":"2","q":"Hồ Chí Minh đã đánh giá như thế nào về chủ nghĩa Tam dân của Tôn Trung sơn?","a":"Có những điều thích hợp với điều kiện nước ta."},{"c":"2","q":"Theo quan niệm Hồ Chí Minh, ưu điểm lớn nhất của chủ nghĩa Mác là gì?","a":"Phương pháp biện chứng."},{"c":"2","q":"Trong các giá trị truyền thống của dân tộc Việt Nam, giá trị nào có tác động mạnh nhất thúc giục Hồ Chí Minh đi ra tìm đường cứu nước?","a":"Chủ nghĩa yêu nước."},{"c":"2","q":"Trong quá trình hình thành tư tưởng của mình, Hồ Chí Minh đã tiếp thu những giá trị tích cực nào của Nho giáo?","a":"Triết lý hành động và ước vọng về một xã hội bình trị."},{"c":"2","q":"Trong quá trình hình thành hệ tư tưởng của mình, Hồ Chí Minh đã tiếp thu giá trị tích cực nào của văn hóa phương Tây?","a":"Giá trị về quyền sống, quyền tự do và quyền mưu cầu hạnh phúc."},{"c":"2","q":"Đâu KHÔNG phải là nhân tố chủ quan hình thành nên tư tưởng Hồ Chí Minh?","a":"Truyền thống dân tộc."},{"c":"2","q":"Từ khi thực dân Pháp xâm lược, Việt Nam từ một nước phong kiến độc lập trở thành nước","a":"Thuộc địa nửa phong kiến."},{"c":"2","q":"Dưới chính sách cai trị thuộc địa của thực dân Pháp, xã hội Việt Nam bên cạnh mâu thuẫn cũ đã nảy sinh mâu thuẫn mới nào?","a":"Dân tộc Việt Nam với thực dân Pháp xâm lược."},{"c":"2","q":"Nguyên nhân dẫn đến sự thất bại của phong trào yêu nước theo khuynh hướng dân chủ tư sản cuối thế kỷ XIX đầu thế kỷ XX?","a":"Chưa có đường lối và phương pháp đấu tranh đúng đắn."},{"c":"2","q":"\"Đưa hổ cửa trước, rước beo cửa sau\" là nhận xét của Nguyễn Ái Quốc về chủ trương cứu nước sai lầm của ai?","a":"Phan Bội Châu."},{"c":"2","q":"Trước khi ra đi tìm đường cứu nước, Nguyễn Tất Thành đã dạy học ở đâu?","a":"Trường Dục Thanh, Phan Thiết."},{"c":"2","q":"Ngày 05 tháng 6 năm 1911 Bác Hồ ra đi tìm đường cứu nước với tên gọi gì?","a":"Văn Ba."},{"c":"2","q":"Hình thức Nguyễn Ái Quốc truyền bá chủ nghĩa Mác – Lênin đến những người yêu nước Việt Nam tại Quảng Châu, Trung Quốc là gì?","a":"Mở lớp huấn luyện chính trị."},{"c":"2","q":"Tiêu ngữ \"Độc lập – Tự do – Hạnh phúc\" được Chủ tịch Hồ Chí Minh đặt ra trên cơ sở tiếp thu giá trị lý luận nào?","a":"Chủ nghĩa Tam dân của Tôn Trung Sơn."},{"c":"2","q":"Hồ Chí Minh có khả năng tư duy nào khi nhận xét, đánh giá các sự vật, sự việc?","a":"Tư duy độc lập, tự chủ, sáng tạo, đầu óc có phê phán."},{"c":"2","q":"Hồ Chí Minh khẳng định muốn cứu nước giải phóng dân tộc không có con đường nào khác ngoài con đường cách mạng vô sản trong hoàn cảnh nào?","a":"Nghiên cứu Sơ thảo lần thứ nhất những luận cương về vấn đề dân tộc và thuộc địa."},{"c":"2","q":"Hồ Chí Minh hoàn toàn tin theo Lênin và Quốc tế III là vì","a":"Họ bênh vực cho các dân tộc bị áp bức trên thế giới."},{"c":"2","q":"Nguồn gốc lý luận quyết định tính chất khoa học và cách mạng của tư tưởng Hồ Chí Minh là:","a":"Chủ nghĩa Mác-Lênin."},{"c":"2","q":"Trong thời kỳ ra đi tìm đường cứu nước, Hồ Chí Minh tham gia tổ chức Đảng nào đầu tiên?","a":"Đảng Xã hội Pháp."},{"c":"2","q":"Trong thời kỳ ra đi tìm đường cứu nước, Hồ Chí Minh đã tham gia sáng lập Đảng Cộng sản nào ở Châu Âu?","a":"Đảng Cộng sản Pháp."},{"c":"2","q":"Sự kiện nào tạo nên sự chuyển biến trong cuộc đời Hồ Chí Minh, từ người yêu nước trở thành người Cộng sản?","a":"Biểu quyết tán thành Quốc tế III và tham gia thành lập Đảng Cộng sản Pháp."},{"c":"2","q":"\"Luận cương của Lênin làm cho tôi rất cảm động, phấn khởi, sáng tỏ, tin tưởng biết bao...\" Nguyễn Ái Quốc nói câu ấy khi đang ở đâu?","a":"Paris, Pháp."},{"c":"2","q":"Tác phẩm nào của Hồ Chí Minh là sự tập hợp những bài giảng của Người cho đội ngũ cán bộ cốt cán đầu tiên nhằm tuyên truyền chủ nghĩa Mác – Lênin?","a":"Đường cách mệnh."},{"c":"2","q":"Tháng 06 năm 1925, Nguyễn Ái Quốc đã thành lập tổ chức nào và cho ra tờ báo tiếng Việt đầu tiên?","a":"Hội Việt Nam cách mạng Thanh niên và Báo Thanh niên."},{"c":"2","q":"Sự kiện nào đã chấm dứt cuộc khủng hoảng về đường lối và tổ chức lãnh đạo cách mạng Việt Nam kéo dài suốt từ cuối thế kỷ XIX sang đầu năm 1930?","a":"Sự kiện thành lập Đảng Cộng sản Việt Nam và Cương lĩnh chính trị đầu tiên của Đảng."},{"c":"2","q":"Thời kỳ từ đầu năm 1930 đến đầu năm 1941, Nguyễn Ái Quốc đã gặp phải những khó khăn nào?","a":"Bị Quốc tế cộng sản nghi ngờ và bị bắt ở Hồng Kông."},{"c":"2","q":"Hội nghị Trung ương nào đã đánh dấu sự trở về của Nguyễn Ái Quốc sau 30 năm ra đi tìm đường cứu nước?","a":"Hội nghị Trung ương Đảng tháng 5/1941."},{"c":"2","q":"Hồ Chí Minh tin theo chủ nghĩa Lênin và Quốc tế III, xuất phát từ","a":"Chủ nghĩa yêu nước."},{"c":"2","q":"Tại Hội nghị Trung ương VIII (tháng 5/1941) Hồ Chí Minh khẳng định nhiệm vụ nào là \"bức thiết nhất\"?","a":"Nhiệm vụ giải phóng dân tộc."},{"c":"2","q":"Trong Tuyên ngôn độc lập đọc trước toàn thể quốc dân và thế giới vào ngày 02/9/1945, Hồ Chí Minh khẳng định quyền cơ bản nào của các dân tộc?","a":"Quyền bình đẳng."},{"c":"2","q":"Theo Hồ Chí Minh, hạn chế lớn nhất của các nhà yêu nước tiền bối là không thấy được","a":"Sự biến đổi của thời đại."},{"c":"2","q":"Năm 1908, Người đã tham gia phong trào biểu tình và bị chính quyền thực dân đuổi học. Tên của phong trào đó là gì?","a":"Phong trào chống thuế ở Trung Kì."},{"c":"2","q":"Trong nhà tù của Tưởng Giới Thạch, Bác đã viết tập thơ nào?","a":"Ngục trung nhật ký."},{"c":"2","q":"Lựa chọn phương án SAI: Nguyễn Ái Quốc đã chuẩn bị những điều kiện cho sự ra đời của Đảng Cộng sản Việt Nam về","a":"Cán bộ."},{"c":"2","q":"\"Dân tộc ta, nhân dân ta, non sông đất nước ta đã sinh ra Hồ Chủ tịch...\" Câu nói trên được nêu trong tài liệu nào?","a":"Điếu văn của Ban Chấp hành Trung ương Đảng lao động Việt Nam đọc tại lễ truy điệu Chủ tịch Hồ Chí Minh ngày 09/09/1969."},{"c":"2","q":"Nguyễn Ái Quốc ảnh hưởng tư tưởng \"thân dân\" từ ai?","a":"Nguyễn Sinh Sắc."},{"c":"2","q":"Nguyễn Ái Quốc đến với chủ nghĩa Mác – Lênin xuất phát từ nhu cầu","a":"Thực tiễn của cách mạng Việt Nam."},{"c":"2","q":"Hồ Chí Minh đã vận dụng Chủ nghĩa Mác - Lênin vào thực tiễn cách mạng Việt Nam như thế nào?","a":"Vận dụng sáng tạo và phù hợp với cách mạng Việt Nam."},{"c":"2","q":"\"Tất cả các dân tộc trên thế giới đều sinh ra bình đẳng, dân tộc nào cũng có quyền sống, quyền sung sướng và quyền tự do\". Câu trên được trích từ tác phẩm nào của Hồ Chí Minh?","a":"Tuyên ngôn độc lập."},{"c":"2","q":"Điều đặc biệt làm nên thành công của Nguyễn Ái Quốc khi đến với chủ nghĩa Mác – Lênin là Người đã","a":"Có một học vốn chắc chắn, một bản lĩnh, trí tuệ vững vàng."},{"c":"2","q":"Nguyễn Ái Quốc đã truyền bá chủ nghĩa Mác - Lênin vào phong trào công nhân và phong trào yêu nước Việt Nam bằng những cách nào?","a":"Thông qua báo chí và các hoạt động thực tiễn."},{"c":"2","q":"Cương lĩnh chính trị đầu tiên (2/1930) của Đảng là sự vận dụng sáng tạo và phát triển Chủ nghĩa Mác-Lênin trong việc giải quyết mối quan hệ","a":"Giai cấp, dân tộc, quốc tế trong đường lối cách mạng Việt Nam."},{"c":"2","q":"Hồ Chí Minh nêu rõ: \"Bây giờ học thuyết nhiều, chủ nghĩa nhiều, nhưng chủ nghĩa chân chính nhất, chắc chắn nhất, cách mệnh nhất là chủ nghĩa...\"","a":"Lê-nin."},{"c":"2","q":"\"Mỗi đảng viên và cán bộ phải thật sự thấm nhuần đạo đức cách mạng, thật sự cần, kiệm, liêm, chính, chí công vô tư\", được trích trong tác phẩm nào?","a":"Di chúc của chủ tịch Hồ Chí Minh."},{"c":"2","q":"Ai là người đã có công lớn trong việc cứu Hồ Chí Minh ra khỏi nhà tù của thực dân Anh ở Hồng Kông?","a":"Luật sư Frank Loseby."},{"c":"2","q":"Hồ Chí Minh viết: \"Chúng ta thà hy sinh tất cả, chứ nhất định không chịu mất nước, nhất định không chịu làm nô lệ\", trong tác phẩm nào?","a":"Lời kêu gọi toàn quốc kháng chiến."},{"c":"2","q":"Hồ Chí Minh đã tiếp thu những yếu tố nào của Phật giáo?","a":"Tư tưởng vị tha, tinh thần từ bi bác ái, tinh thần cứu khổ cứu nạn."},{"c":"2","q":"\"Không! Chúng ta thà hy sinh tất cả chứ nhất định không chịu mất nước...\" Câu nói trên được Hồ Chí Minh tuyên bố vào thời kì nào?","a":"Khi cuộc kháng chiến toàn quốc chống thực dân Pháp bùng nổ."},{"c":"2","q":"Ngày 17/7/1966, Hồ Chí Minh đã gửi thư cho đồng bào và chiến sĩ cả nước, trong đó Người nêu cao chân lý nào?","a":"Không có gì quý hơn độc lập tự do."},{"c":"3","q":"Trong \"Bản yêu sách của nhân dân An Nam\" gửi tới Hội nghị các nước đế quốc thắng trận họp ở Véc-xây (Pháp) năm 1919, Nguyễn Ái Quốc đã","a":"Đòi các quyền tự do, dân chủ và bình đẳng cho nhân dân An Nam."},{"c":"3","q":"Đối tượng của cách mạng Việt Nam được xác định trong Cương lĩnh chính trị năm 1930 là:","a":"Thực dân Pháp và phong kiến tay sai."},{"c":"3","q":"Trong tác phẩm Đường Kách mệnh, Nguyễn Ái Quốc đã xác định lực lượng nào là gốc của cách mạng?","a":"Công nhân, nông dân."},{"c":"3","q":"Trong tác phẩm Đường Kách mệnh, Nguyễn Ái Quốc đã xác định lực lượng nào là bầu bạn của cách mạng?","a":"Tầng lớp trí thức, tiểu tư sản, trung và tiểu địa chủ."},{"c":"3","q":"Chọn phương án SAI khi nói về quan điểm của Hồ Chí Minh về vấn đề độc lập dân tộc?","a":"Độc lập dân tộc là nền độc lập được bảo vệ bởi các nước đồng minh."},{"c":"3","q":"Con đường cách mạng đúng đắn Nguyễn Ái Quốc đã lựa chọn cho cách mạng Việt Nam là","a":"Cách mạng vô sản."},{"c":"3","q":"\"Dân tộc độc lập, dân quyền tự do và dân sinh hạnh phúc\" là nội dung nằm trong học thuyết \"Tam dân\" của ai?","a":"Tôn Trung Sơn."},{"c":"3","q":"Trong quan điểm của Chủ tịch Hồ Chí Minh, cách mạng giải phóng dân tộc muốn thắng lợi do ai lãnh đạo?","a":"Đảng Cộng sản Việt Nam."},{"c":"3","q":"Theo tư tưởng Hồ Chí Minh, cách mạng giải phóng dân tộc phải dựa trên lực lượng:","a":"Đại đoàn kết toàn dân, lấy liên minh công, nông làm nền tảng."},{"c":"3","q":"Cách định nghĩa chủ nghĩa xã hội của Chủ tịch Hồ Chí Minh mang tính","a":"Giản dị, mộc mạc, dễ hiểu."},{"c":"3","q":"Chọn cụm từ ĐÚNG: \"Nói một cách tóm tắt, mộc mạc, ... trước hết làm cho nhân dân lao động thoát nạn bần cùng, làm cho mọi người có công ăn việc làm, được ấm no và sống một đời hạnh phúc\"","a":"Chủ nghĩa xã hội."},{"c":"3","q":"Chọn phương án SAI: Theo Hồ Chí Minh, để xác định bước đi và tìm cách làm cho chủ nghĩa xã hội phù hợp với Việt Nam cần","a":"Có người lãnh đạo xuất chúng."},{"c":"3","q":"Theo Hồ Chí Minh, tính chất của thời kỳ quá độ lên chủ nghĩa xã hội ở Việt Nam?","a":"Lâu dài, khó khăn, gian khổ."},{"c":"3","q":"Theo Hồ Chí Minh, đặc điểm lớn nhất của thời kỳ quá độ ở Việt Nam?","a":"Quá độ gián tiếp."},{"c":"3","q":"Độc lập, tự do là quyền thiêng liêng, bất khả xâm phạm của","a":"Tất cả các dân tộc."},{"c":"3","q":"Chọn phương án ĐÚNG trong các luận điểm dưới đây của Hồ Chí Minh:","a":"Cách mạng ở thuộc địa không những phụ thuộc vào cách mạng vô sản ở chính quốc mà có thể giành thắng lợi trước."},{"c":"3","q":"Theo quan niệm của Hồ Chí Minh, nhân tố có vai trò quan trọng nhất đảm bảo cho cách mạng giải phóng dân tộc thắng lợi là gì?","a":"Vai trò lãnh đạo của Đảng Cộng sản."},{"c":"3","q":"Vì sao Hồ Chí Minh lại chủ trương đưa cách mạng giải phóng dân tộc đi theo con đường cách mạng vô sản?","a":"Cuộc cách mạng này nhằm giải phóng dân tộc một cách triệt để."},{"c":"3","q":"Hoàn thiện câu nói của Hồ Chí Minh: \"Toàn thể dân tộc Việt Nam quyết đem tất cả ... và lực lượng, ... và ... để giữ vững quyền tự do, độc lập ấy\".","a":"Tinh thần - tính mạng - của cải."},{"c":"3","q":"Hồ Chí Minh quan niệm về Chủ nghĩa dân tộc như thế nào?","a":"Là chủ nghĩa yêu nước và tinh thần dân tộc."},{"c":"3","q":"Theo Hồ Chí Minh, độc lập dân tộc gắn liền với chủ nghĩa xã hội, có như vậy","a":"Người dân mới được giải phóng thực sự."},{"c":"3","q":"Trong những luận điểm về cách mạng giải phóng dân tộc, luận điểm nào có vai trò quyết định nhất?","a":"Cách mạng giải phóng dân tộc phải do Đảng Cộng sản lãnh đạo."},{"c":"3","q":"Theo Hồ Chí Minh, muốn xây dựng chủ nghĩa xã hội trước hết cần có","a":"Con người xã hội chủ nghĩa."},{"c":"3","q":"Vì sao Hồ Chí Minh khẳng định: cách mạng giải phóng dân tộc phải tiến hành bằng con đường cách mạng bạo lực?","a":"Vì chủ nghĩa đế quốc sử dụng bạo lực để xâm lược và thống trị các dân tộc."},{"c":"3","q":"Theo quan niệm của Hồ Chí Minh, mục tiêu cao nhất của chủ nghĩa xã hội ở Việt Nam là","a":"Không ngừng nâng cao đời sống vật chất và tinh thần của nhân dân."},{"c":"3","q":"Yếu tố nào thể hiện sức mạnh của ngoại lực theo quan niệm của Hồ Chí Minh?","a":"Sự hợp tác, giúp đỡ quốc tế."},{"c":"3","q":"Theo quan điểm của Hồ Chí Minh, thực chất của thời kỳ quá độ lên chủ nghĩa xã hội ở Việt Nam là:","a":"Cải biến nền sản xuất lạc hậu thành nền sản xuất tiên tiến, hiện đại."},{"c":"3","q":"Trong khi tiến hành đàm phán, thương lượng, Hồ Chí Minh quan tâm nhất đến vấn đề gì?","a":"Độc lập cho dân tộc."},{"c":"3","q":"Theo Hồ Chí Minh, để xác định bước đi và tìm cách làm cho chủ nghĩa xã hội phù hợp với Việt Nam cần","a":"Tham khảo, học tập kinh nghiệm của các nước anh em."},{"c":"3","q":"\"Cách mệnh Pháp cũng như cách mệnh Mỹ, nghĩa là cách mệnh tư bản, cách mệnh ... tiếng là cộng hòa và dân chủ, kỳ thực trong thì nó tước lục công nông, ngoài thì nó áp bức thuộc địa\".","a":"Không đến nơi."},{"c":"3","q":"\"Trong thế giới bây giờ chỉ có cách mệnh ... là đã thành công và thành công đến nơi\".","a":"Nga."},{"c":"3","q":"Chọn phương án ĐÚNG nhất: \"Tất cả sinh lực của chủ nghĩa tư bản đều lấy ở các xứ thuộc địa\".","a":"Đây là luận điểm của Nguyễn Ái Quốc."},{"c":"3","q":"Hồ Chí Minh: \"Trong cuộc đấu tranh gian khổ chống kẻ thù của giai cấp và của dân tộc, cần dùng ... chống lại ..., giành lấy chính quyền và bảo vệ chính quyền\"","a":"Bạo lực cách mạng - bạo lực phản cách mạng."},{"c":"3","q":"Theo Hồ Chí Minh, hình thức của bạo lực cách mạng bao gồm:","a":"Đấu tranh chính trị kết hợp với đấu tranh vũ trang."},{"c":"3","q":"Tư tưởng bạo lực cách mạng của Hồ Chí Minh luôn gắn bó hữu cơ với tư tưởng","a":"Nhân đạo và hòa bình."},{"c":"3","q":"Chọn phương án ĐÚNG:","a":"Hồ Chí Minh không có khái niệm cố định nào về chủ nghĩa xã hội."},{"c":"3","q":"Chọn phương án SAI: Theo Hồ Chí Minh, nguyên tắc xây dựng chủ nghĩa xã hội trong thời kỳ quá độ ở Việt Nam đó là","a":"Vận dụng đúng theo từng câu chữ của học thuyết Mác – Lênin."},{"c":"3","q":"Theo Hồ Chí Minh, độc lập dân tộc và chủ nghĩa xã hội là hai giai đoạn cách mạng có mối quan hệ","a":"Biện chứng, tác động mật thiết với nhau."},{"c":"3","q":"Ai là người đầu tiên chủ trương độc lập dân tộc gắn liền với chủ nghĩa xã hội ở Việt Nam?","a":"Hồ Chí Minh."},{"c":"3","q":"Theo Hồ Chí Minh, bạo lực cách mạng là bạo lực của","a":"Quần chúng."},{"c":"3","q":"\"Nước giành được độc lập mà dân không được hưởng quyền ..., thì độc lập chẳng có ý nghĩa gì\"","a":"Tự do."},{"c":"3","q":"Theo quan niệm của Hồ Chí Minh, vì sao ở Việt Nam, giai cấp địa chủ, giai cấp tư sản dân tộc và giai cấp nông dân đều có sự tương đồng?","a":"Vì cùng chung số phận là người dân mất nước."},{"c":"3","q":"Hồ Chí Minh khẳng định: Chủ nghĩa dân tộc là một động lực lớn ở các nước đang đấu tranh giành độc lập, đó là chủ nghĩa dân tộc","a":"Chân chính."},{"c":"3","q":"Theo tư tưởng Hồ Chí Minh về thực hiện bước đi trong xây dựng chủ nghĩa xã hội phải","a":"Dần dần, thận trọng từng bước một."},{"c":"3","q":"Trong quan niệm của Hồ Chí Minh, chủ nghĩa xã hội là chế độ chính trị do","a":"Nhân dân lao động làm chủ."},{"c":"3","q":"Theo Hồ Chí Minh, nguyên tắc phân phối chủ yếu trong chủ nghĩa xã hội là","a":"Làm theo năng lực, hưởng theo lao động."},{"c":"3","q":"Theo Hồ Chí Minh, biện pháp cơ bản, quyết định, lâu dài trong xây dựng chủ nghĩa xã hội là gì?","a":"Đem của dân, tài dân, sức dân, làm lợi cho dân dưới sự lãnh đạo của Đảng."},{"c":"3","q":"Theo Hồ Chí Minh, trong thời kỳ quá độ lên chủ nghĩa xã hội ở Việt Nam mục tiêu về kinh tế","a":"Xây dựng nền kinh tế phát triển cao."},{"c":"3","q":"Theo Hồ Chí Minh, trong thời kỳ quá độ lên chủ nghĩa xã hội ở Việt Nam mục tiêu về chế độ chính trị","a":"Phải xây dựng được chế độ dân chủ."},{"c":"3","q":"Theo Hồ Chí Minh: Xây dựng chủ nghĩa xã hội ở Việt Nam mục tiêu về xã hội là","a":"Phải đảm bảo dân chủ, công bằng, văn minh."},{"c":"3","q":"Trong tư tưởng Hồ Chí Minh, xây dựng chủ nghĩa xã hội thì lợi ích cá nhân phải luôn","a":"Đặt trong lợi ích chung của tập thể."},{"c":"3","q":"Trong tư tưởng Hồ Chí Minh, nền kinh tế xã hội chủ nghĩa được tạo lập dựa trên chế độ sở hữu","a":"Toàn dân và tập thể."},{"c":"3","q":"Theo Hồ Chí Minh, trong xây dựng chủ nghĩa xã hội, thành phần kinh tế nào được ưu tiên phát triển?","a":"Kinh tế quốc doanh."},{"c":"3","q":"Theo Hồ Chí Minh, trong thời kỳ quá độ lên chủ nghĩa xã hội phải cải tạo nền kinh tế cũ, xây dựng nền kinh tế mới có","a":"Công nghiệp và nông nghiệp hiện đại."},{"c":"3","q":"Trong cải tạo xã hội chủ nghĩa, Hồ Chí Minh chủ trương đối xử với giai cấp tư sản dân tộc như thế nào?","a":"Cải tạo họ thành người lao động mới."},{"c":"3","q":"Phương châm thành lập của Đội Việt Nam tuyên truyền giải phóng quân:","a":"Coi trọng, đề cao đấu tranh chính trị."},{"c":"3","q":"\"Vận dụng công thức của Các Mác, chúng tôi xin nói với anh em rằng, công cuộc giải phóng anh em chỉ có thể thực hiện được bằng sự nỗ lực của bản thân anh em\". Hàm ý của câu nói trên?","a":"Tính chủ động trong cuộc đấu tranh."},{"c":"3","q":"Hồ Chí Minh đã giải thích như thế nào khi coi giai cấp công nhân và nông dân là lực lượng cơ bản của cách mạng?","a":"Là hai giai cấp đông đảo và cách mạng nhất, bị bóc lột nặng nề nhất."},{"c":"3","q":"Luận điểm sáng tạo nổi bật của Nguyễn Ái Quốc về cách mạng giải phóng dân tộc:","a":"Cách mạng giải phóng dân tộc cần chủ động, sáng tạo, có khả năng giành thắng lợi trước cách mạng vô sản ở chính quốc."},{"c":"3","q":"Độc lập dân tộc phải là nền độc lập thực sự, hoàn toàn và triệt để trên","a":"Tất cả các lĩnh vực."},{"c":"3","q":"\"Dù khó khăn gian khổ đến mấy, … nhân dân ta sẽ hoàn toàn thắng lợi. Đế quốc Mỹ … phải cút khỏi nước ta...\" Điền từ:","a":"Nhất định."},{"c":"3","q":"Trong tư tưởng Hồ Chí Minh, vấn đề nào được Người coi là quyền thiêng liêng, bất khả xâm phạm của tất cả các dân tộc?","a":"Độc lập - Tự do."},{"c":"3","q":"Nét độc đáo của tư tưởng Hồ Chí Minh khi đề cập đến cơ cấu kinh tế là gì?","a":"Coi nông nghiệp là mặt trận hàng đầu."},{"c":"3","q":"Phương châm chiến lược của Hồ Chí Minh trong cách mạng giải phóng dân tộc là","a":"Tự lực cánh sinh."},{"c":"3","q":"Hồ Chí Minh chưa bổ sung quan điểm nào vào cách tiếp cận về Chủ nghĩa xã hội?","a":"Việt Nam phải kinh qua kinh tế tư bản chủ nghĩa."},{"c":"3","q":"Ngày nay, chúng ta xác định phải \"kiên trì\" con đường mà Hồ Chí Minh đã lựa chọn, có nghĩa là","a":"Thực hiện mục tiêu độc lập dân tộc gắn liền với chủ nghĩa xã hội."},{"c":"3","q":"Trong hình thức bạo lực cách mạng, yếu tố nào có vai trò tiêu diệt lực lượng quân sự của địch?","a":"Đấu tranh vũ trang."},{"c":"3","q":"Phương châm chiến lược trong cách mạng giải phóng dân tộc theo quan điểm của Hồ Chí Minh là gì?","a":"Đánh lâu dài."},{"c":"3","q":"Hồ Chí Minh khẳng định Cách mạng Tháng Mười Nga không chỉ là cuộc cách mạng vô sản mà còn là cuộc cách mạng","a":"Giải phóng dân tộc."},{"c":"4","q":"Cơ sở lý luận nào đã hình thành nên Đảng Cộng sản Việt Nam?","a":"Chủ nghĩa Mác-Lênin."},{"c":"4","q":"Đảng Cộng sản trên thế giới được thành lập từ các yếu tố nào?","a":"Chủ nghĩa xã hội khoa học với phong trào công nhân."},{"c":"4","q":"Theo Hồ Chí Minh, Đảng Cộng sản Việt Nam được thành lập từ các yếu tố nào?","a":"Sự kết hợp chủ nghĩa Mác-Lênin với phong trào công nhân và phong trào yêu nước."},{"c":"4","q":"Hồ Chí Minh thành lập Đảng Cộng sản Việt Nam trong bối cảnh quốc tế có biến động gì lớn nhất?","a":"Sự kết hợp chủ nghĩa tư bản từ giai đoạn tự do cạnh tranh chuyển sang giai đoạn đế quốc chủ nghĩa."},{"c":"4","q":"Theo Hồ Chí Minh, nền tảng tư tưởng cốt lõi của Đảng Cộng sản Việt Nam là gì?","a":"Chủ nghĩa Mác - Lênin."},{"c":"4","q":"Phong trào nào có vai trò quan trọng trong hàng ngàn năm dựng nước và giữ nước của dân tộc Việt Nam?","a":"Phong trào yêu nước."},{"c":"4","q":"Công tác nào là công tác gốc của Đảng Cộng sản Việt Nam?","a":"Công tác cán bộ."},{"c":"4","q":"Hồ Chí Minh nói: \"Phê bình mình cũng như phê bình người phải ráo riết, triệt để, thật thà, không nể nang, không thêm bớt\". Đây là nội dung của","a":"Tự phê bình và phê bình."},{"c":"4","q":"\"Đảng có vững, cách mệnh mới thành công, cũng như người cầm lái có vững thuyền mới chạy\". Đoạn trích trên trong tác phẩm nào?","a":"Đường cách mệnh."},{"c":"4","q":"\"Đảng ta là một Đảng cầm quyền. Mỗi đảng viên và cán bộ phải thật sự thấm nhuần đạo đức cách mạng...\" Đoạn trích trên trong tác phẩm nào?","a":"Di chúc."},{"c":"4","q":"Chủ tịch Hồ Chí Minh coi nguyên tắc tự phê bình và phê bình là việc làm thường xuyên, cần thực hiện như thế nào?","a":"Như mỗi ngày phải rửa mặt."},{"c":"4","q":"Trong Di chúc, Chủ tịch Hồ Chí Minh yêu cầu giữ gìn sự đoàn kết, thống nhất trong Đảng như giữ gìn","a":"Con ngươi của mắt mình."},{"c":"4","q":"Theo Hồ Chí Minh, xây dựng đội ngũ cán bộ, đảng viên cần phải thế nào?","a":"Phải tuyệt đối trung thành với Đảng."},{"c":"4","q":"Khi chưa có chính quyền, nhiệm vụ chính trong các cuộc đấu tranh của dân tộc dưới sự lãnh đạo của Đảng là gì?","a":"Lật đổ chính quyền bè lũ thực dân và phong kiến, thiết lập chính quyền nhân dân."},{"c":"4","q":"Trong bối cảnh cách mạng mới, Đảng Cộng sản Việt Nam xác định nhiệm vụ nào là trọng tâm?","a":"Xây dựng kinh tế."},{"c":"4","q":"Trong bối cảnh cách mạng mới, Đảng ta xác định nhiệm vụ nào là then chốt?","a":"Xây dựng Đảng."},{"c":"4","q":"Thuật ngữ nào phản ánh rõ nhất, chính xác nhất vai trò lãnh đạo của Đảng?","a":"Đảng cầm quyền."},{"c":"4","q":"Đảng Cộng sản Việt Nam trở thành Đảng cầm quyền thông qua phương thức nào?","a":"Lãnh đạo nhân dân đấu tranh giành chính quyền."},{"c":"4","q":"Điều kiện tiên quyết để Đảng thực hiện nguyên tắc tập trung dân chủ:","a":"Đảng phải trong sạch, vững mạnh."},{"c":"4","q":"Nguyên tắc nào được Hồ Chí Minh coi \"như mỗi ngày phải rửa mặt\"?","a":"Tự phê bình và phê bình."},{"c":"4","q":"Theo Chủ tịch Hồ Chí Minh nguyên tắc nào được coi là nguyên tắc tổ chức của Đảng?","a":"Tập trung dân chủ."},{"c":"4","q":"Theo Chủ tịch Hồ Chí Minh đâu là nguyên tắc lãnh đạo của Đảng?","a":"Tập thể lãnh đạo cá nhân phụ trách."},{"c":"4","q":"Theo Chủ tịch Hồ Chí Minh nguyên tắc nào được coi là nguyên tắc sinh hoạt của Đảng?","a":"Tự phê bình và phê bình."},{"c":"4","q":"Thành tố nào được xem là nhân tố quan trọng thúc đẩy sự kết hợp các yếu tố cho sự ra đời của Đảng Cộng sản Việt Nam?","a":"Phong trào yêu nước trí thức của Việt Nam."},{"c":"4","q":"\"Phải thẳng thắn, chân thành, trung thực, không nể nang, không giấu giếm, không thêm bớt khuyết điểm\" nói về nguyên tắc nào?","a":"Tự phê bình và phê bình."},{"c":"4","q":"\"Nhiều người thì nhiều kinh nghiệm... Góp kinh nghiệm và sự xem xét của nhiều người, thì vấn đề đó được thấy rõ khắp mọi mặt\". Hồ Chí Minh nói về nguyên tắc nào?","a":"Tập thể lãnh đạo cá nhân phụ trách."},{"c":"4","q":"Luận điểm: sự lãnh đạo của Đảng là nhân tố hàng đầu đưa cách mạng đến thắng lợi cuối cùng, là xác định:","a":"Vai trò lãnh đạo của Đảng."},{"c":"5","q":"Trong tư tưởng Hồ Chí Minh, đại đoàn kết toàn dân tộc có ý nghĩa như thế nào tới thành công của cách mạng?","a":"Quyết định."},{"c":"5","q":"Trong tư tưởng Hồ Chí Minh, đối với cách mạng Việt Nam đại đoàn kết toàn dân tộc được xem là gì?","a":"Chiến lược lâu dài."},{"c":"5","q":"Theo tư tưởng Hồ Chí Minh, đoàn kết phải lấy lợi ích tối cao của dân tộc, lợi ích căn bản của nhân dân lao động làm","a":"Mục tiêu phấn đấu."},{"c":"5","q":"Theo tư tưởng Hồ Chí Minh, cách mạng Việt Nam là một bộ phận của cách mạng nào?","a":"Thế giới."},{"c":"5","q":"Theo tư tưởng Hồ Chí Minh, cách mạng Việt Nam chỉ có thể thành công khi thực hiện đoàn kết chặt chẽ với phong trào nào?","a":"Cách mạng thế giới."},{"c":"5","q":"Theo tư tưởng Hồ Chí Minh, nguyên tắc hoạt động của Mặt trận dân tộc thống nhất là gì?","a":"Hiệp thương dân chủ."},{"c":"5","q":"Theo tư tưởng Hồ Chí Minh, trong quá trình xây dựng khối đại đoàn kết toàn dân tộc phải đứng vững trên lập trường của giai cấp nào?","a":"Công nhân."},{"c":"5","q":"Theo tư tưởng Hồ Chí Minh, mẫu số chung để quy tụ các tầng lớp, giai cấp, đảng phái, dân tộc và tôn giáo vào trong Mặt trận là gì?","a":"Lợi ích tối cao của dân tộc và lợi ích căn bản của nhân dân."},{"c":"5","q":"Theo Hồ Chí Minh, khối đại đoàn kết toàn dân tộc chỉ trở thành lực lượng to lớn, có sức mạnh vật chất khi được tập hợp, tổ chức lại thành","a":"Mặt trận dân tộc thống nhất."},{"c":"5","q":"Theo tư tưởng Hồ Chí Minh, để làm tốt công tác vận động quần chúng thì mọi phương pháp phải phù hợp với gì?","a":"Tâm tư và nguyện vọng của quần chúng."},{"c":"5","q":"Sức mạnh tổng hợp các yếu tố vật chất và tinh thần, trước hết là sức mạnh của chủ nghĩa yêu nước và ý thức tự lực, tự cường dân tộc, đó chính là sức mạnh của","a":"Dân tộc."},{"c":"5","q":"Trong lời kết thúc buổi ra mắt Đảng Lao động Việt Nam, Hồ Chí Minh tuyên bố mục đích của Đảng có thể gồm trong tám chữ:","a":"Đoàn kết toàn dân, phụng sự tổ quốc."},{"c":"5","q":"Hồ Chí Minh từng khẳng định \"Ai có tài, có đức, có sức, có lòng phụng sự Tổ quốc và phục vụ nhân dân thì ta đoàn kết với họ\". Từ \"ta\" ở đây là nói đến ai?","a":"Nhân dân Việt Nam."},{"c":"5","q":"Theo tư tưởng Hồ Chí Minh, thực hiện đại đoàn kết toàn dân tộc có vai trò như thế nào đối với việc thực hiện đoàn kết quốc tế?","a":"Cơ sở."},{"c":"5","q":"Theo tư tưởng Hồ Chí Minh, động lực chủ yếu của sự phát triển nước ta hiện nay là gì?","a":"Phát huy sức mạnh đại đoàn kết dân tộc."},{"c":"5","q":"Đối với phong trào cộng sản và công nhân quốc tế, Hồ Chí Minh đã giương cao ngọn cờ nào?","a":"Độc lập dân tộc gắn liền với chủ nghĩa xã hội."},{"c":"5","q":"Đối với các dân tộc trên thế giới, Hồ Chí Minh đã giương cao ngọn cờ nào?","a":"Độc lập, tự do và quyền bình đẳng giữa các dân tộc."},{"c":"5","q":"Nền tảng của khối đại đoàn kết toàn dân tộc trong tư tưởng Hồ Chí Minh là gì?","a":"Công nhân, nông dân và trí thức."},{"c":"5","q":"Hình thức đại đoàn kết dân tộc theo quan điểm Hồ Chí Minh là gì?","a":"Mặt trận dân tộc thống nhất."},{"c":"5","q":"Nguyên tắc xây dựng và hoạt động của Mặt trận dân tộc thống nhất trong tư tưởng Hồ Chí Minh là gì?","a":"Phải đoàn kết lâu dài, chặt chẽ, đoàn kết thật sự, chân thành, thân ái giúp đỡ nhau cùng tiến bộ."},{"c":"5","q":"Hồ Chí Minh tuyên bố tại buổi lễ ra mắt Đảng Lao động Việt Nam (3/3/1951) về mục đích của Đảng là \"Đoàn kết toàn dân\" để làm gì?","a":"Phụng sự Tổ quốc."},{"c":"5","q":"Theo Hồ Chí Minh, lực lượng của khối đại đoàn kết toàn dân là?","a":"Toàn thể Nhân dân Việt Nam."},{"c":"5","q":"Trong mối quan hệ đoàn kết trong Đảng - đoàn kết trong nhân dân - đoàn kết quốc tế, đâu là nhân tố quyết định sức mạnh?","a":"Đoàn kết trong Đảng."},{"c":"5","q":"Theo Hồ Chí Minh đối với những đồng bào lầm đường, lạc lối, ta phải làm gì?","a":"Lấy tình thân ái mà cảm hoá."},{"c":"5","q":"Hồ Chí Minh đã kế thừa giá trị văn hoá nào của Việt Nam để hình thành tư tưởng về đại đoàn kết toàn dân?","a":"Yêu nước - đoàn kết - nhân nghĩa."},{"c":"5","q":"Theo Hồ Chí Minh, lực lượng nào là nền tảng của Mặt trận dân tộc thống nhất?","a":"Liên minh công nhân - nông dân."},{"c":"5","q":"Theo tư tưởng Hồ Chí Minh, một trong những nguyên tắc đoàn kết quốc tế đó là gì?","a":"Đoàn kết trên cơ sở độc lập tự chủ."},{"c":"5","q":"Tháng 09 năm 1947, Hồ Chí Minh tuyên bố chính sách đối ngoại của nước Việt Nam là \"làm bạn với tất cả mọi nước ... và không gây thù oán với một ai\".","a":"Dân chủ."},{"c":"5","q":"Yếu tố nào được xem là \"hạt nhân\" của khối đại đoàn kết toàn dân tộc trong tư tưởng Hồ Chí Minh?","a":"Sự đoàn kết và thống nhất trong Đảng Cộng sản Việt Nam."},{"c":"5","q":"Thực hiện tư tưởng Hồ Chí Minh, với phương châm \"cầu đồng tồn dị\", Đảng phải dựa trên cơ sở nào để xây dựng nguyên tắc đoàn kết dân tộc?","a":"Lấy cái chung để hạn chế cái riêng, cái khác biệt."},{"c":"5","q":"Thực hiện tư tưởng Hồ Chí Minh, làm tốt công tác vận động quần chúng là làm tốt điều gì?","a":"Dân vận."},{"c":"5","q":"Thực hiện tư tưởng Hồ Chí Minh, Đảng Cộng sản Việt Nam phải coi sức mạnh thời đại là:","a":"Sức mạnh của phong trào cách mạng thế giới, đó là chủ nghĩa Mác - Lênin."},{"c":"5","q":"Khi bàn về đại đoàn kết dân tộc, theo Hồ Chí Minh, nhân tố quyết định sự thành bại của cách mạng là gì?","a":"Chính sách, phương pháp và chủ trương tập hợp đại đoàn kết dân tộc."},{"c":"5","q":"Đảng Cộng sản Việt Nam luôn đề phòng, đấu tranh chống mọi biểu hiện gì để đoàn kết nội bộ?","a":"Khuynh hướng cô độc, hẹp hòi, đoàn kết một chiều, vô nguyên tắc."},{"c":"5","q":"Hồ Chí Minh viết năm 1942: \"Sử dạy cho ta bài học này: Lúc nào dân ta đoàn kết muôn người như một thì nước ta độc lập, tự do...\". Người muốn nhấn mạnh tới","a":"Vị trí, vai trò của đại đoàn kết toàn dân."},{"c":"5","q":"\"Đại đoàn kết tức là trước hết phải đoàn kết với đại đa số nhân dân... Đó là nền, gốc của đại đoàn kết...\". Hồ Chí Minh đã đề cập tới?","a":"Lực lượng của khối đại đoàn kết toàn dân."},{"c":"5","q":"Hồ Chí Minh khẳng định lực lượng nào là nền tảng của khối đại đoàn kết toàn dân?","a":"Liên minh công – nông – tầng lớp trí thức."},{"c":"5","q":"Với lực lượng đối lập, Chủ tịch Hồ Chí Minh có nghệ thuật xử lý khéo léo. Nhờ đó cách mạng Việt Nam giai đoạn 1945-1946:","a":"Tranh thủ khai thác tối đa mâu thuẫn trong hàng ngũ kẻ thù."},{"c":"5","q":"Theo Hồ Chí Minh, trong sự nghiệp cách mạng của Việt Nam \"muốn người ta giúp cho\" thì phải làm gì?","a":"Kêu gọi sự ủng hộ của các nước xã hội chủ nghĩa anh em."},{"c":"5","q":"Câu nói về đại đoàn kết toàn dân tộc của Hồ Chí Minh tại Đại hội đại biểu Mặt trận Tổ quốc Việt Nam lần thứ 2 ngày 25/4/1961?","a":"Đoàn kết, đoàn kết, đại đoàn kết. Thành công, thành công, đại thành công."},{"c":"6","q":"Theo Hồ Chí Minh, văn hoá theo nghĩa rộng là gì?","a":"Sự tổng hợp mọi phương thức sinh hoạt của con người."},{"c":"6","q":"Theo Hồ Chí Minh, các lĩnh vực văn hoá, chính trị, kinh tế, xã hội thì lĩnh vực nào là quan trọng nhất?","a":"Các lĩnh vực quan trọng ngang nhau."},{"c":"6","q":"Theo Hồ Chí Minh, văn hoá phải được đặt ngang hàng với lĩnh vực nào?","a":"Kinh tế, chính trị, xã hội."},{"c":"6","q":"Theo Hồ Chí Minh, phẩm chất đạo đức \"Cần\" của người cách mạng là gì?","a":"Siêng năng, chăm chỉ, cố gắng dẻo dai."},{"c":"6","q":"Theo Hồ Chí Minh, phẩm chất đạo đức \"Kiệm\" của người cách mạng là gì?","a":"Không xa xỉ, không hoang phí, không bừa bãi."},{"c":"6","q":"Theo Hồ Chí Minh, phẩm chất đạo đức \"Liêm\" của người cách mạng là gì?","a":"Trong sạch, không tham lam."},{"c":"6","q":"Theo Hồ Chí Minh, phẩm chất đạo đức \"Chính\" của người cách mạng là gì?","a":"Thẳng thắn, đúng đắn."},{"c":"6","q":"Theo Hồ Chí Minh, phẩm chất đạo đức \"Chí công vô tư\" của người cách mạng là gì?","a":"Vì lợi ích chung, không vì lợi ích riêng."},{"c":"6","q":"Theo Hồ Chí Minh, đạo đức có vai trò như thế nào đối với người cách mạng?","a":"Là gốc, là nền tảng, là sức mạnh, là tiêu chuẩn hàng đầu của người cách mạng."},{"c":"6","q":"Hồ Chí Minh khẳng định: \"Nay ở trong thơ nên có thép. ... Cũng phải biết xung phong\".","a":"Nhà thơ."},{"c":"6","q":"Khi nói về vai trò của đạo đức, Hồ Chí Minh cho rằng đối với phương Đông một tấm gương sống còn có giá trị hơn","a":"100 bài diễn văn tuyên truyền."},{"c":"6","q":"Trung thành với sự nghiệp dựng nước và giữ nước, suốt đời phấn đấu cho Đảng, cho cách mạng. Đó là nội dung của chuẩn mực đạo đức nào?","a":"Trung với nước."},{"c":"6","q":"Theo Hồ Chí Minh, đức tính Cần phải đi liền với đức tính nào như hai chân của con người?","a":"Kiệm."},{"c":"6","q":"Theo Hồ Chí Minh, đức tính Liêm phải đi liền với đức tính nào?","a":"Chính."},{"c":"6","q":"Hồ Chí Minh viết: \"Trời có bốn mùa... Đất có bốn phương... Người có bốn đức: ...\"","a":"Cần, kiệm, liêm, chính."},{"c":"6","q":"Chọn phương án SAI: Biểu hiện của văn hoá được đề cập trong định nghĩa văn hoá của Hồ Chí Minh (tháng 08 năm 1943) là:","a":"Chính trị."},{"c":"6","q":"Đâu KHÔNG phải là nguồn gốc hình thành tư tưởng đạo đức Hồ Chí Minh?","a":"Tư tưởng đạo đức tư sản."},{"c":"6","q":"Trong tư tưởng Hồ Chí Minh, chữ NGƯỜI theo nghĩa hẹp là gì?","a":"Gia đình, anh em, họ hàng, bầu bạn."},{"c":"6","q":"Khái niệm con người trong tư tưởng Hồ Chí Minh để chỉ","a":"Con người cụ thể gắn với hoàn cảnh lịch sử cụ thể."},{"c":"6","q":"Theo tư tưởng Hồ Chí Minh, con người trong giải phóng dân tộc là","a":"Cả cộng đồng dân tộc Việt Nam."},{"c":"6","q":"Theo tư tưởng Hồ Chí Minh, con người trong giải phóng con người ở phạm vi thế giới là","a":"Loài người."},{"c":"6","q":"Sau Cách mạng Tháng Tám, văn hoá được Hồ Chí Minh xác định là","a":"Toàn bộ đời sống tinh thần của xã hội, thuộc về kiến trúc thượng tầng."},{"c":"6","q":"Theo Hồ Chí Minh, văn hoá là thuộc về","a":"Kiến trúc thượng tầng."},{"c":"6","q":"Quan hệ giữa văn hoá với chính trị, theo Hồ Chí Minh văn hoá phải ở vị trí nào so với chính trị?","a":"Trong."},{"c":"6","q":"\"Giải phóng chính trị đồng nghĩa với giải phóng xã hội, từ đó văn hóa mới có điều kiện phát triển\". Đó là mối quan hệ giữa văn hoá với lĩnh vực nào?","a":"Xã hội."},{"c":"6","q":"Theo Hồ Chí Minh, muốn tiến lên chủ nghĩa xã hội thì phải phát triển","a":"Kinh tế và văn hoá."},{"c":"6","q":"Tính chất của nền văn hoá Việt Nam thời kỳ cách mạng dân tộc dân chủ nhân dân trong Đề cương văn hoá năm 1943 là gì?","a":"Dân tộc, khoa học, đại chúng."},{"c":"6","q":"Vai trò của văn hoá đạo đức, lối sống là gì?","a":"Nâng cao phẩm giá, phong cách lành mạnh cho con người, hướng con người tới các giá trị chân, thiện, mỹ."},{"c":"6","q":"Văn hoá là một mặt trận, tức là nói đến cuộc đấu tranh cách mạng trên lĩnh vực nào?","a":"Văn hoá, tư tưởng."},{"c":"6","q":"Hồ Chí Minh khẳng định: \"Văn hoá nghệ thuật cũng là một mặt trận. Anh chị em là chiến sĩ trên mặt trận ấy\". Anh chị em ở đây là nói đến ai?","a":"Văn nghệ sĩ."},{"c":"6","q":"Theo Hồ Chí Minh, để làm tròn nhiệm vụ phụng sự Tổ quốc, chiến sĩ nghệ thuật phải","a":"Có lập trường, tư tưởng vững vàng."},{"c":"6","q":"Theo Hồ Chí Minh, mọi hoạt động văn hóa phải trở về với cuộc sống thực tại của quần chúng, phản ánh được tư tưởng và khát vọng của","a":"Quần chúng."},{"c":"6","q":"Hồ Chí Minh cho rằng: \"Văn hóa ... cho quốc dân đi\".","a":"Soi đường."},{"c":"6","q":"Hồ Chí Minh khẳng định: \"Một dân tộc dốt là một dân tộc ...\"","a":"Yếu."},{"c":"6","q":"Vai trò của người nghệ sĩ trong lĩnh vực văn hoá văn nghệ theo tư tưởng Hồ Chí Minh là","a":"Người chiến sĩ."},{"c":"6","q":"Theo tư tưởng Hồ Chí Minh, đời sống văn hoá mới không bao gồm những mặt nào?","a":"Cách sống mới."},{"c":"6","q":"Trong tác phẩm Sửa đổi lối làm việc, Hồ Chí Minh viết: \"Người cách mạng phải có ..., không có ... thì dù tài giỏi mấy cũng không lãnh đạo được nhân dân\".","a":"Đạo đức."},{"c":"6","q":"Theo Hồ Chí Minh, cán bộ lấy tiêu chuẩn nào làm cốt cán?","a":"Đạo đức."},{"c":"6","q":"Theo Hồ Chí Minh, nếu không có đạo đức cách mạng thì có tài cũng","a":"Vô dụng."},{"c":"6","q":"Hồ Chí Minh viết: \"Đạo đức cũ như người đầu ngược xuống đất chân chổng lên trời. Đạo đức mới như người hai chân đứng vững được dưới đất, đầu ...\"","a":"Ngẩng lên trời."},{"c":"6","q":"Thương dân, tin dân, lắng nghe dân, phục vụ nhân dân hết lòng. Gần dân, kính trọng dân... Đó là nội dung của chuẩn mực đạo đức nào?","a":"Hiếu với dân."},{"c":"6","q":"Phẩm chất đạo đức gắn liền với hoạt động hàng ngày, là nội dung cốt lõi của đạo đức cách mạng?","a":"Cần, kiệm, liêm, chính, chí công vô tư."},{"c":"6","q":"Theo Hồ Chí Minh, chủ nghĩa quốc tế vô sản phải gắn liền với","a":"Chủ nghĩa yêu nước chân chính."},{"c":"6","q":"Đâu KHÔNG phải là nguyên tắc xây dựng đạo đức mới theo Hồ Chí Minh?","a":"Trung với nước, hiếu với dân."},{"c":"6","q":"Tôn trọng, hiểu biết, thương yêu và đoàn kết với giai cấp vô sản toàn thế giới. Đó là nội dung của phẩm chất đạo đức nào?","a":"Tinh thần quốc tế trong sáng."},{"c":"6","q":"Theo tư tưởng đạo đức Hồ Chí Minh, nguyên nhân nào đẻ ra mọi thói hư, tật xấu?","a":"Chủ nghĩa cá nhân."},{"c":"6","q":"Đâu KHÔNG phải là phẩm chất cơ bản của con người Việt Nam trong thời đại mới theo tư tưởng Hồ Chí Minh?","a":"Nhân, lễ, nghĩa, trí, dũng."},{"c":"6","q":"Xoá bỏ tình trạng áp bức, bóc lột, nô dịch con người, làm cho mọi người được hưởng tự do, hạnh phúc, đó là nội dung giải phóng","a":"Con người."},{"c":"6","q":"Theo Hồ Chí Minh, nhân tố nào được xem là vốn quý nhất, là động lực, là nhân tố quyết định thành công của sự nghiệp cách mạng?","a":"Con người."},{"c":"6","q":"Hồ Chí Minh khẳng định: \"Trong bầu trời không gì quý bằng ..., trong thế giới không gì mạnh bằng sức mạnh đoàn kết của ...\".","a":"Nhân dân."},{"c":"6","q":"Con người theo quan niệm của Hồ Chí Minh là","a":"Động lực của cách mạng."},{"c":"6","q":"Theo Hồ Chí Minh, muốn xây dựng chủ nghĩa xã hội, trước hết cần phải có con người","a":"Xã hội chủ nghĩa."},{"c":"6","q":"Xây dựng con người toàn diện vừa \"hồng\" vừa \"chuyên\". Đây là tư tưởng nào của Hồ Chí Minh về con người?","a":"Nội dung xây dựng con người."},{"c":"6","q":"Đâu KHÔNG phải là khía cạnh chủ yếu để xây dựng con người toàn diện theo tư tưởng Hồ Chí Minh?","a":"Có ý thức làm chủ, tư tưởng cá nhân trên hết."},{"c":"6","q":"\"Trong bầu trời không gì quí bằng nhân dân. Trong thế giới không gì mạnh bằng lực lượng đoàn kết của nhân dân\". Đó chính là","a":"Coi nhân dân là nguồn gốc của mọi sức mạnh."},{"c":"6","q":"Nội dung cốt lõi của bản sắc văn hóa dân tộc Việt Nam là gì?","a":"Lòng yêu nước, tinh thần độc lập, tự cường, tự tôn dân tộc."},{"c":"6","q":"Bản sắc văn hóa dân tộc Việt Nam có hình thức gì?","a":"Cốt cách, đặc tính, ngôn ngữ, phong tục, tập quán."},{"c":"6","q":"Theo Hồ Chí Minh, mối quan hệ giữa văn hóa với chính trị là gì?","a":"Sự giải phóng chính trị mở đường cho văn hóa phát triển."},{"c":"6","q":"Vai trò của văn hóa pháp luật là","a":"Đảm bảo dân chủ, trật tự, kỷ cương, phép nước."},{"c":"6","q":"Động lực của văn hóa đạo đức là","a":"Hướng con người đến các giá trị chân, thiện, mỹ."},{"c":"6","q":"Trong tác phẩm Sửa đổi lối làm việc (1947), Hồ Chí Minh chỉ ra hậu quả của việc người cách mạng không có đạo đức sẽ","a":"Không lãnh đạo được nhân dân."},{"c":"6","q":"Trong tác phẩm \"Người cán bộ cách mạng\" (1955), Hồ Chí Minh ví \"mọi việc thành công hay thất bại\" là do","a":"Cán bộ có thấm nhuần đạo đức cách mạng hay là không."},{"c":"6","q":"Hồ Chí Minh quan tâm tới giáo dục toàn diện cho các em học sinh, sinh viên về:","a":"Đức, trí, thể, mỹ."},{"c":"6","q":"Theo Hồ Chí Minh, hiểu chủ nghĩa Mác – Lênin để","a":"Sống với nhau có tình có nghĩa."},{"c":"6","q":"Theo Hồ Chí Minh, \"Bốn phương vô sản đều là...\"?","a":"Anh em."},{"c":"6","q":"Chọn phương án SAI. Theo Hồ Chí Minh, những nguyên tắc xây dựng đạo đức mới đó là:","a":"Tập trung nhiệm vụ xây, xem nhẹ nhiệm vụ chống."},{"c":"6","q":"Theo Hồ Chí Minh, dân chỉ biết rõ giá trị của \"độc lập, tự do\" khi nào?","a":"Được ăn no, mặc ấm."},{"c":"6","q":"Theo Hồ Chí Minh, con người có vai trò với cách mạng như thế nào?","a":"Vừa là mục tiêu vừa là động lực."},{"c":"6","q":"Theo Hồ Chí Minh, nội dung cốt lõi của đạo đức cách mạng là:","a":"Cần, kiệm, liêm, chính, chí công vô tư."},{"c":"6","q":"Theo Hồ Chí Minh, những phẩm chất thống nhất của con người là:","a":"Đức và Tài."},{"c":"6","q":"Theo Hồ Chí Minh, \"Hồng\" và \"Chuyên\" là nói về","a":"Phẩm chất và năng lực thống nhất của con người."},{"c":"6","q":"Chọn phương án ĐÚNG khi bàn về vai trò đạo đức trong tư tưởng Hồ Chí Minh.","a":"Đạo đức là nhân tố tạo nên sức hấp dẫn của chủ nghĩa xã hội."},{"c":"6","q":"\"Người cách mạng phải có … làm nền tảng, mới hoàn thành được nhiệm vụ cách mạng vẻ vang\".","a":"Đạo đức cách mạng."},{"c":"6","q":"Quan điểm Hồ Chí Minh về mối quan hệ giữa văn hóa với kinh tế trong cách mạng là gì?","a":"Mối quan hệ biện chứng."},{"c":"6","q":"Vai trò của văn hóa chính trị là","a":"Soi đường cho quốc dân đi, lãnh đạo quốc dân để thực hiện độc lập, tự cường, tự chủ."},{"c":"6","q":"Nâng cao lòng yêu nước, lý tưởng tình cảm cách mạng, sự lạc quan, quyết tâm, tin vào thắng lợi cuối cùng là nội dung của","a":"Văn hóa văn nghệ."},{"c":"6","q":"Câu thơ \"Hiền, giữ đâu phải là tính sẵn. Phần nhiều do giáo dục mà nên\" của Hồ Chí Minh nhấn mạnh đến yếu tố nào của giáo dục?","a":"Vai trò."},{"c":"6","q":"Theo Hồ Chí Minh, đạo đức cách mạng có vai trò gì với người cách mạng?","a":"Giúp vững vàng trong mọi khó khăn thử thách."},{"c":"6","q":"Theo quan niệm Hồ Chí Minh, để đánh giá đạo đức phải dựa vào yếu tố nào?","a":"Hiệu quả trong thực tế."},{"c":"6","q":"Vận dụng tư tưởng Hồ Chí Minh về đạo đức, kiên quyết chống chủ nghĩa cá nhân, phải học tốt yếu tố nào đầu tiên?","a":"Cần, kiệm, liêm, chính, chí công vô tư."},{"c":"6","q":"Yếu tố nào giúp chúng ta thực hiện tốt nhiệm vụ thiêng liêng là xây dựng và bảo vệ Tổ quốc?","a":"Trung với nước, hiếu với dân."},{"c":"6","q":"Theo Hồ Chí Minh, sinh viên \"học để làm việc, làm người, làm cán bộ, muốn đạt được mục đích ấy phải ...\"?","a":"Cần, kiệm, liêm, chính, chí công vô tư."},{"c":"6","q":"Yếu tố nào KHÔNG phải là hình thức của bản sắc văn hóa dân tộc?","a":"Lòng yêu nước thương nòi; tinh thần độc lập, tự cường, tự tôn dân tộc."},{"c":"6","q":"Văn hoá là mục tiêu, động lực của sự nghiệp cách mạng, nói đến nội dung nào của văn hoá?","a":"Vai trò."},{"c":"6","q":"Động lực có ý nghĩa soi đường cho quốc dân đi, đó là vai trò của lĩnh vực văn hoá nào?","a":"Văn hoá chính trị."},{"c":"6","q":"Góp phần nâng cao lòng yêu nước, lý tưởng, tình cảm cách mạng, đó là vai trò của lĩnh vực văn hoá nào?","a":"Văn hoá văn nghệ."},{"c":"6","q":"\"Họ cung cấp cho những nhà hoạt động văn hoá những tư liệu quý. Và chính họ là những người thẩm định khách quan, trung thực, chính xác các sản phẩm văn nghệ\". Họ ở đây là ai?","a":"Quần chúng nhân dân."},{"c":"6","q":"Thời kỳ nhân dân miền Bắc quá độ lên chủ nghĩa xã hội, Hồ Chí Minh chủ trương xây dựng nền văn hoá","a":"Có nội dung xã hội chủ nghĩa và tính dân tộc."},{"c":"6","q":"Vai trò của tác phẩm văn nghệ trong lĩnh vực văn hoá văn nghệ theo tư tưởng Hồ Chí Minh?","a":"Là vũ khí sắc bén trong đấu tranh cách mạng, xây dựng xã hội mới, con người mới."},{"c":"6","q":"Vấn đề xây dựng đời sống mới được Hồ Chí Minh đặt ra từ khi nào?","a":"Sau Cách mạng Tháng Tám năm 1945."},{"c":"6","q":"Những căn bệnh trong bộ máy nhà nước mà Hồ Chí Minh gọi là \"giặc nội xâm\"?","a":"Tham ô, lãng phí, quan liêu."},{"c":"6","q":"Theo Hồ Chí Minh, việc tu dưỡng đạo đức ở mỗi người phải được thực hiện trong","a":"Mọi hoạt động thực tiễn, mọi mối quan hệ xã hội."},{"c":"6","q":"Cuộc vận động \"Đẩy mạnh học tập và làm theo tư tưởng, đạo đức, phong cách Hồ Chí Minh\" được thực hiện theo Chỉ thị nào?","a":"Chỉ thị 05-CT/TW của Bộ Chính trị khóa XII."},{"c":"6","q":"Trong tư tưởng đạo đức Hồ Chí Minh, phẩm chất đạo đức bao trùm quan trọng nhất là","a":"Trung với nước, hiếu với dân."},{"c":"6","q":"\"Luôn tôn trọng giữ gìn của công và của dân; không xâm phạm một đồng xu, hạt thóc của nhà nước...\". Đó là nội dung của đức tính nào?","a":"Liêm."},{"c":"6","q":"\"Đối với mình, không tự cao tự đại... Đối với người, không nịnh hót... Đối với việc, để việc công lên trên việc tư...\". Đó là nội dung của đức tính nào?","a":"Chính."},{"c":"6","q":"\"Không xa xỉ, không hoang phí, không bừa bãi\". Đó là nội dung của đức tính nào?","a":"Kiệm."},{"c":"6","q":"\"Lao động siêng năng, lao động có kế hoạch, sáng tạo, có năng suất cao\". Đó là nội dung của đức tính nào?","a":"Cần."},{"c":"6","q":"\"Làm việc gì cũng vì lợi ích chung, không vì cá nhân... công tâm luôn đặt lợi ích của Đảng, của nhân dân lên trên hết\". Đó là phẩm chất đạo đức nào?","a":"Chí công vô tư."}];
+</script>
+<script>
+// ---- STATE ----
+var questions = [];
+var options = [];
+var answers = {};
+var timeLeft = 3600;
+var timerId = null;
+var submitted = false;
+
+// ---- HELPERS ----
+function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+// ---- LOAD QUESTIONS ----
+function loadQuestions() {
+  document.getElementById('btnStart').textContent = 'ĐANG TẢI...';
+  document.getElementById('btnStart').disabled = true;
+  questions = shuffle(QUESTIONS_DATA).slice(0, 60);
+  buildOptions();
+  startQuiz();
+}
+
+function buildOptions() {
+  var allAnswers = questions.map(function(q) { return q.a; });
+  options = questions.map(function(q) {
+    var others = allAnswers.filter(function(a) { return a !== q.a; });
+    var distractors = shuffle(others).slice(0, 3);
+    return shuffle([q.a].concat(distractors));
+  });
+}
+
+// ---- START QUIZ ----
+function startQuiz() {
+  answers = {};
+  submitted = false;
+  timeLeft = 3600;
+  document.getElementById('pageIntro').classList.add('hidden');
+  document.getElementById('pageQuiz').classList.remove('hidden');
+  document.getElementById('pageResult').classList.add('hidden');
+
+  renderNav();
+  renderQuestions();
+  updateStatus();
+  startTimer();
+  window.scrollTo(0, 0);
+}
+
+// ---- RENDER ----
+function renderNav() {
+  var html = '';
+  for (var i = 0; i < questions.length; i++) {
+    html += '<div class="nav-dot" data-nav="' + i + '">' + (i + 1) + '</div>';
+  }
+  document.getElementById('navStrip').innerHTML = html;
+}
+
+function renderQuestions() {
+  var html = '';
+  var letters = ['A', 'B', 'C', 'D'];
+  for (var i = 0; i < questions.length; i++) {
+    var q = questions[i];
+    var opts = options[i];
+    html += '<div class="q-card" id="card' + i + '">';
+    html += '<div class="q-num">Câu ' + (i + 1) + ' (Chương ' + q.c + ')</div>';
+    html += '<div class="q-text">' + q.q + '</div>';
+    for (var j = 0; j < opts.length; j++) {
+      html += '<div class="opt" data-qi="' + i + '" data-oi="' + j + '" id="opt' + i + '_' + j + '">';
+      html += '<span class="letter">' + letters[j] + '</span>';
+      html += '<span>' + opts[j] + '</span>';
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+  document.getElementById('qList').innerHTML = html;
+}
+
+// ---- EVENT DELEGATION ----
+document.getElementById('qList').addEventListener('click', function(e) {
+  if (submitted) return;
+  var el = e.target;
+  while (el && el !== this) {
+    if (el.classList && el.classList.contains('opt')) {
+      var qi = parseInt(el.getAttribute('data-qi'));
+      var oi = parseInt(el.getAttribute('data-oi'));
+      if (!isNaN(qi) && !isNaN(oi)) {
+        setAnswer(qi, oi);
+      }
+      return;
+    }
+    el = el.parentNode;
+  }
+});
+
+document.getElementById('navStrip').addEventListener('click', function(e) {
+  var el = e.target;
+  while (el && el !== this) {
+    if (el.classList && el.classList.contains('nav-dot')) {
+      var idx = parseInt(el.getAttribute('data-nav'));
+      if (!isNaN(idx)) {
+        var card = document.getElementById('card' + idx);
+        if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+    el = el.parentNode;
+  }
+});
+
+function setAnswer(qi, oi) {
+  answers[qi] = oi;
+  // Update option UI
+  var card = document.getElementById('card' + qi);
+  var opts = card.querySelectorAll('.opt');
+  for (var i = 0; i < opts.length; i++) {
+    opts[i].classList.remove('chosen');
+  }
+  var chosen = document.getElementById('opt' + qi + '_' + oi);
+  if (chosen) chosen.classList.add('chosen');
+  // Update nav dot
+  var dots = document.getElementById('navStrip').querySelectorAll('.nav-dot');
+  if (dots[qi]) dots[qi].classList.add('done');
+  updateStatus();
+}
+
+function updateStatus() {
+  var count = Object.keys(answers).length;
+  var pct = (count / questions.length) * 100;
+  document.getElementById('lblCount').textContent = 'Đã làm: ' + count + '/' + questions.length;
+  document.getElementById('barFill').style.width = pct + '%';
+}
+
+// ---- TIMER ----
+function startTimer() {
+  updateTimer();
+  if (timerId) clearInterval(timerId);
+  timerId = setInterval(function() {
+    timeLeft--;
+    updateTimer();
+    if (timeLeft <= 0) { clearInterval(timerId); doSubmit(); }
+  }, 1000);
+}
+
+function updateTimer() {
+  var m = Math.floor(timeLeft / 60);
+  var s = timeLeft % 60;
+  document.getElementById('lblTime').textContent = '⏱ ' + m + ':' + (s < 10 ? '0' : '') + s;
+  if (timeLeft < 300) document.getElementById('lblTime').style.color = '#c62828';
+}
+
+// ---- SUBMIT ----
+function doSubmit() {
+  if (submitted) return;
+  var unanswered = questions.length - Object.keys(answers).length;
+  if (unanswered > 0) {
+    if (!confirm('Bạn còn ' + unanswered + ' câu chưa trả lời. Nộp bài?')) return;
+  }
+  submitted = true;
+  if (timerId) clearInterval(timerId);
+
+  var correct = 0;
+  var review = [];
+
+  for (var i = 0; i < questions.length; i++) {
+    var q = questions[i];
+    var userOi = answers[i];
+    var userAns = userOi !== undefined ? options[i][userOi] : '(Chưa trả lời)';
+    var isOk = userAns === q.a;
+    if (isOk) correct++;
+
+    // Highlight in quiz
+    var card = document.getElementById('card' + i);
+    var opts = card.querySelectorAll('.opt');
+    for (var j = 0; j < opts.length; j++) {
+      if (options[i][j] === q.a) opts[j].classList.add('right');
+      if (j === userOi && !isOk) opts[j].classList.add('wrong');
+    }
+
+    review.push({ chapter: q.c, question: q.q, correct: q.a, yours: userAns, ok: isOk });
+  }
+
+  document.getElementById('btnSubmit').disabled = true;
+  document.getElementById('btnSubmit').textContent = '✅ ĐÃ NỘP';
+  showResult(correct, review);
+}
+
+function showResult(correct, review) {
+  document.getElementById('pageQuiz').classList.add('hidden');
+  document.getElementById('pageResult').classList.remove('hidden');
+
+  var score = Math.round((correct / questions.length) * 100);
+  var passed = score >= 50;
+  var html = '';
+
+  html += '<div class="score-box">';
+  html += '<div class="score-circle ' + (passed ? 'ok' : 'not') + '">';
+  html += '<span class="score-num">' + score + '%</span>';
+  html += '<span class="score-tag">' + (passed ? 'ĐẠT' : 'CHƯA ĐẠT') + '</span>';
+  html += '</div>';
+  html += '<h3>' + (passed ? '🎉 Chúc mừng!' : '💪 Cố gắng lần sau!') + '</h3>';
+  html += '<div class="stat-row">';
+  html += '<div class="stat"><div class="val green">' + correct + '</div><div class="lbl">Đúng</div></div>';
+  html += '<div class="stat"><div class="val red">' + (questions.length - correct) + '</div><div class="lbl">Sai</div></div>';
+  html += '<div class="stat"><div class="val">' + questions.length + '</div><div class="lbl">Tổng</div></div>';
+  html += '</div></div>';
+
+  html += '<h3 style="margin:16px 0 8px">📋 Xem lại:</h3>';
+  for (var i = 0; i < review.length; i++) {
+    var r = review[i];
+    html += '<div class="review ' + (r.ok ? 'good' : 'bad') + '">';
+    html += '<div class="rq">Câu ' + (i + 1) + ' (C' + r.chapter + '): ' + r.question + '</div>';
+    html += '<div class="ra">Bạn chọn: ' + r.yours + '</div>';
+    if (!r.ok) html += '<div class="rc">✓ Đáp án: ' + r.correct + '</div>';
+    html += '</div>';
+  }
+
+  document.getElementById('resultContent').innerHTML = html;
+  window.scrollTo(0, 0);
+}
+
+// ---- BUTTON HANDLERS ----
+document.getElementById('btnStart').addEventListener('click', function(e) {
+  e.preventDefault();
+  loadQuestions();
+});
+
+document.getElementById('btnSubmit').addEventListener('click', function(e) {
+  e.preventDefault();
+  doSubmit();
+});
+
+document.getElementById('btnRetake').addEventListener('click', function(e) {
+  e.preventDefault();
+  document.getElementById('pageResult').classList.add('hidden');
+  document.getElementById('btnSubmit').disabled = false;
+  document.getElementById('btnSubmit').textContent = '📝 NỘP BÀI';
+  loadQuestions();
+});
+
+document.getElementById('btnPrint').addEventListener('click', function(e) {
+  e.preventDefault();
+  window.print();
+});
+</script>
+</body>
+</html>
