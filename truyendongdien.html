@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Trắc Nghiệm Truyền Động Điện - C2: DC Motor Driver</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-size:16px;-webkit-text-size-adjust:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  background:#f0ebe3;color:#2c1810;min-height:100vh;padding-bottom:80px
+}
+
+.topbar{
+  background:#1565c0;color:#fff;padding:12px 16px;text-align:center;
+  font-weight:700;font-size:17px;position:sticky;top:0;z-index:10;
+  box-shadow:0 2px 6px rgba(0,0,0,.25)
+}
+
+.intro{max-width:650px;margin:24px auto;padding:0 16px;text-align:center}
+.intro h2{color:#1565c0;font-size:22px;margin-bottom:4px}
+.intro .sub{color:#5d4037;font-size:14px;margin-bottom:12px}
+.info-list{
+  background:#fff;border-radius:10px;padding:16px;text-align:left;
+  margin-bottom:20px;box-shadow:0 1px 4px rgba(0,0,0,.08)
+}
+.info-list li{padding:6px 0;color:#5d4037;font-size:15px;list-style:none}
+.info-list li::before{content:'⚡ '}
+.tabs{display:flex;gap:4px;margin-bottom:16px}
+.tab-btn{
+  flex:1;padding:10px 0;border:none;border-radius:8px 8px 0 0;
+  font-size:14px;font-weight:700;cursor:pointer;background:#e0e0e0;color:#5d4037;
+  -webkit-appearance:none
+}
+.tab-btn.active{background:#1565c0;color:#fff}
+.tab-content{display:none;text-align:left}
+.tab-content.active{display:block}
+
+.formula-box{
+  background:#fff;border-radius:10px;padding:14px 16px;margin-bottom:10px;
+  box-shadow:0 1px 3px rgba(0,0,0,.06);border-left:4px solid #1565c0
+}
+.formula-box h4{color:#1565c0;font-size:15px;margin-bottom:8px}
+.formula-box .eq{font-size:17px;font-weight:700;color:#0d47a1;padding:4px 0;font-family:monospace}
+.formula-box .note{font-size:13px;color:#5d4037;margin-top:4px}
+
+.big-btn{
+  display:block;width:100%;max-width:320px;margin:20px auto;padding:16px 0;
+  background:#1565c0;color:#fff;border:none;border-radius:10px;
+  font-size:18px;font-weight:700;cursor:pointer;text-align:center;
+  box-shadow:0 3px 10px rgba(21,101,192,.3);-webkit-appearance:none
+}
+.big-btn:active{background:#0d47a1;transform:scale(.97)}
+.big-btn:disabled{background:#bdbdbd}
+.hidden{display:none!important}
+
+.quiz-area{max-width:700px;margin:0 auto;padding:0 12px}
+.status-bar{
+  display:flex;align-items:center;gap:10px;background:#fff;
+  border-radius:8px;padding:10px 14px;margin-bottom:10px;
+  font-size:14px;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.06);
+  position:sticky;top:48px;z-index:9
+}
+.status-bar .bar{flex:1;height:6px;background:#e0e0e0;border-radius:3px;overflow:hidden}
+.status-bar .bar-fill{height:100%;background:#1565c0;border-radius:3px;transition:width .3s}
+
+.q-card{
+  background:#fff;border-radius:10px;padding:16px;margin-bottom:10px;
+  box-shadow:0 1px 3px rgba(0,0,0,.06);border-left:4px solid #1565c0
+}
+.q-num{font-size:13px;color:#1565c0;font-weight:700;margin-bottom:6px}
+.q-text{font-size:16px;line-height:1.5;margin-bottom:12px}
+
+.opt{
+  display:flex;align-items:center;gap:10px;padding:12px 14px;margin-bottom:6px;
+  border:2px solid #d7ccc8;border-radius:8px;cursor:pointer;background:#fafafa;
+  transition:background .15s;-webkit-tap-highlight-color:transparent
+}
+.opt:active{background:#f5f5f5}
+.opt .letter{
+  width:34px;height:34px;border-radius:50%;background:#e0e0e0;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:15px;flex-shrink:0
+}
+.opt.chosen{border-color:#1565c0;background:#e3f2fd}
+.opt.chosen .letter{background:#1565c0;color:#fff}
+.opt.right{border-color:#2e7d32;background:#e8f5e9}
+.opt.right .letter{background:#2e7d32;color:#fff}
+.opt.wrong{border-color:#c62828;background:#ffebee}
+.opt.wrong .letter{background:#c62828;color:#fff}
+
+.nav-strip{
+  display:flex;flex-wrap:wrap;gap:5px;background:#fff;
+  border-radius:10px;padding:12px;margin-bottom:10px
+}
+.nav-dot{
+  width:34px;height:34px;border-radius:50%;border:2px solid #d7ccc8;
+  background:#fff;font-size:12px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;cursor:pointer
+}
+.nav-dot.done{background:#1565c0;color:#fff;border-color:#1565c0}
+
+.bottom-bar{
+  position:fixed;bottom:0;left:0;right:0;background:#fff;
+  padding:10px 16px;box-shadow:0 -2px 8px rgba(0,0,0,.1);z-index:10;
+  display:flex;justify-content:center
+}
+.bottom-bar button{
+  width:100%;max-width:400px;padding:14px 0;background:#1565c0;
+  color:#fff;border:none;border-radius:8px;font-size:17px;
+  font-weight:700;cursor:pointer;-webkit-appearance:none
+}
+.bottom-bar button:active{background:#0d47a1}
+.bottom-bar button:disabled{background:#bdbdbd}
+
+/* Post-submit */
+.explain{
+  margin-top:12px;padding:12px 14px;border-radius:8px;
+  font-size:14px;line-height:1.7
+}
+.explain.ok{border-left:4px solid #2e7d32;background:#e8f5e9}
+.explain.bad{border-left:4px solid #c62828;background:#ffebee}
+.explain.miss{border-left:4px solid #e65100;background:#fff8e1}
+.exp-line{font-size:14px;padding:2px 0}
+.exp-ok{color:#2e7d32}
+.exp-bad,.exp-miss{color:#c62828}
+.exp-correct{color:#2e7d32;font-weight:700}
+
+.q-card.correct-card{border-left:4px solid #2e7d32!important;background:#f1f8e9}
+.q-card.wrong-card{border-left:4px solid #c62828!important;background:#fff5f5}
+.q-card.empty-card{border-left:4px solid #e65100!important;background:#fff8f0}
+
+.result-banner{
+  background:#fff;border-radius:10px;padding:20px;text-align:center;
+  margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.08)
+}
+.result-banner h3{font-size:18px;color:#2c1810;margin:10px 0 4px}
+.result-banner .stat-row{display:flex;justify-content:center;gap:28px;margin-top:12px}
+.result-banner .stat .val{font-size:24px;font-weight:700}
+.result-banner .stat .val.green{color:#2e7d32}
+.result-banner .stat .val.red{color:#c62828}
+.result-banner .stat .lbl{font-size:13px;color:#8d6e63}
+
+.score-circle{
+  width:100px;height:100px;border-radius:50%;
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;margin:0 auto 10px;color:#fff;font-weight:700
+}
+.score-circle.ok{background:#2e7d32}
+.score-circle.not{background:#c62828}
+.score-num{font-size:34px}
+.score-tag{font-size:13px}
+
+.bottom-bar .btn-row{display:flex;gap:10px;justify-content:center}
+.bottom-bar .btn-red{background:#c62828;color:#fff;padding:14px 28px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;border:none;-webkit-appearance:none}
+.bottom-bar .btn-out{background:#fff;color:#1565c0;border:2px solid #1565c0;padding:14px 28px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;-webkit-appearance:none}
+.bottom-bar .btn-red:active,.bottom-bar .btn-out:active{transform:scale(.96)}
+
+@media(max-width:600px){
+  .topbar{font-size:15px;padding:10px 12px}
+  .intro h2{font-size:19px}
+  .q-text{font-size:15px}
+  .opt{padding:10px 12px;font-size:14px}
+  .nav-dot{width:30px;height:30px;font-size:11px}
+  .status-bar{font-size:13px;top:44px}
+  .score-num{font-size:28px}
+  .score-circle{width:90px;height:90px}
+  .formula-box .eq{font-size:15px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">⚡ Trắc Nghiệm Truyền Động Điện - Chương 2: DC Motor Driver</div>
+
+<!-- INTRO -->
+<div id="pageIntro">
+  <div class="intro">
+    <h2>📐 Truyền Động Điện</h2>
+    <p class="sub">Chương 2: DC Motor Driver — 40 câu / 45 phút</p>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="tabInfo">ℹ️ Info</button>
+      <button class="tab-btn" data-tab="tabFormula">📋 Công thức</button>
+      <button class="tab-btn" data-tab="tabMethod">🔧 Phương pháp</button>
+    </div>
+
+    <!-- Info tab -->
+    <div class="tab-content active" id="tabInfo">
+      <div class="info-list">
+        <ul>
+          <li>40 câu trắc nghiệm về DC Motor Driver</li>
+          <li>Ngẫu nhiên mỗi lần làm bài</li>
+          <li>Biết điểm ngay sau khi nộp bài</li>
+          <li>Có giải thích đáp án chi tiết</li>
+          <li>Tham khảo tab Công thức & Phương pháp</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Formula tab -->
+    <div class="tab-content" id="tabFormula">
+      <div class="formula-box"><h4>1. Phương trình cơ bản động cơ DC</h4>
+        <div class="eq">E = Ke·Φ·n = (Vn - In·Ra)·(n/nn)</div>
+        <div class="eq">V = E + Ia·Ra</div>
+        <div class="eq">Ke·Φ = (Vn - In·Ra) / nn</div>
+        <div class="note">E: Sức điện động (V); Ke·Φ: Hệ số sức điện động (V/rpm); n: Tốc độ (rpm)</div>
+      </div>
+      <div class="formula-box"><h4>2. Moment điện từ</h4>
+        <div class="eq">T = Kt·Φ·Ia = (60/2π)·Ke·Φ·Ia</div>
+        <div class="eq">Kt·Φ ≈ 9.55 × Ke·Φ</div>
+        <div class="eq">Tn = Kt·Φ × In</div>
+        <div class="note">T: Moment (Nm); Tỉ lệ T ∝ Ia khi Φ = const</div>
+      </div>
+      <div class="formula-box"><h4>3. Bộ chỉnh lưu cầu 1 pha điều khiển toàn phần</h4>
+        <div class="eq">Vdc = (2Vm/π)·cos(α) = (2√2·Vs/π)·cos(α)</div>
+        <div class="eq">Vdc_max = 2√2·Vs/π ≈ 0.9·Vs</div>
+        <div class="note">Vs: điện áp hiệu dụng AC; α: góc kích (0° → 180°)</div>
+      </div>
+      <div class="formula-box"><h4>4. Bộ Chopper (băm áp DC)</h4>
+        <div class="eq">Vout = D·Vs &nbsp;(D = ton/T: duty cycle)</div>
+        <div class="eq">Vout = γ·Vs &nbsp;(γ: tỉ số chu kỳ)</div>
+        <div class="eq">ΔI = (Vs·D·(1-D)) / (fsw·La)</div>
+        <div class="note">Class A: 1 góc phần tư; Class C: 2 góc phần tư; Class E: 4 góc phần tư</div>
+      </div>
+      <div class="formula-box"><h4>5. Hãm tái sinh (Regenerative Braking)</h4>
+        <div class="eq">E > V → Ia = (E - V)/Ra (dòng đảo chiều)</div>
+        <div class="eq">V = E - Ia·Ra</div>
+        <div class="note">Động cơ hoạt động như máy phát, trả năng lượng về nguồn</div>
+      </div>
+      <div class="formula-box"><h4>6. Hãm ngược (Reverse Braking)</h4>
+        <div class="eq">Ia_khởi_điểm = (V + E) / Ra</div>
+        <div class="eq">Radd = (V + E) / I_max - Ra</div>
+        <div class="note">Đảo cực tính điện áp phần ứng, E và V cùng chiều → dòng rất lớn</div>
+      </div>
+      <div class="formula-box"><h4>7. Điện trở phụ (Radd)</h4>
+        <div class="eq">Radd = V_tổng / I_cho_phép - Ra</div>
+        <div class="eq">I_cho_phép = k·In (k = 1.7 hoặc 2)</div>
+        <div class="note">Mắc thêm Radd để giới hạn dòng điện trong quá trình quá độ</div>
+      </div>
+    </div>
+
+    <!-- Method tab -->
+    <div class="tab-content" id="tabMethod">
+      <div class="formula-box"><h4>🔑 Các bước giải bài toán DC Motor Driver</h4>
+        <div class="note" style="white-space:pre-wrap;line-height:1.8">
+<b>Bước 1: Tính thông số định mức</b>
+  • Ke·Φ = (Vn - In·Ra) / nn
+  • Kt·Φ = 9.55 × Ke·Φ
+  • Tn = Kt·Φ × In
+
+<b>Bước 2: Tính thông số ở chế độ tải</b>
+  • Ia_tải = (Tload/Tn) × In
+  • E_tải = Ke·Φ × n_tải
+
+<b>Bước 3: Tính điện áp cần thiết</b>
+  • V = E + Ia·Ra (động cơ)
+  • V = E - Ia·Ra (máy phát / hãm tái sinh)
+
+<b>Bước 4: Chuyển đổi V → α (chỉnh lưu) hoặc D (chopper)</b>
+  • Chỉnh lưu: cos(α) = V / (2√2·Vs/π)
+  • Chopper: D = V / Vs
+
+<b>Bước 5: Tính dòng khởi điểm quá trình quá độ</b>
+  • Hãm tái sinh: Ia = (E_cũ - V_mới) / Ra
+  • Hãm ngược / đảo chiều: Ia = (E_cũ + V_mới) / Ra
+
+<b>Bước 6: Kiểm tra và tính Radd</b>
+  • Nếu Ia_khởi_điểm > I_cho_phép:
+  • Radd = (V_tổng) / I_cho_phép - Ra
+  • V_tổng = E + V (hãm ngược) hoặc E - V (tái sinh)
+
+<b>Bước 7: Tính dòng & moment sau khi thêm Radd</b>
+  • Ia_mới = V_tổng / (Ra + Radd)
+  • T_mới = Kt·Φ × Ia_mới
+
+<b>Bước 8: Tính độ dợn sóng dòng điện (chopper)</b>
+  • ΔI = Vs·D·(1-D) / (fsw·La)
+        </div>
+      </div>
+    </div>
+
+    <button type="button" class="big-btn" id="btnStart">⚡ BẮT ĐẦU LÀM BÀI</button>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div id="pageQuiz" class="hidden">
+  <div class="quiz-area">
+    <div class="status-bar">
+      <span id="lblCount">Đã làm: 0/40</span>
+      <div class="bar"><div class="bar-fill" id="barFill" style="width:0%"></div></div>
+      <span id="lblTime">⏱ 45:00</span>
+    </div>
+    <div class="nav-strip" id="navStrip"></div>
+    <div id="qList"></div>
+  </div>
+  <div class="bottom-bar" id="bottomBar">
+    <button id="btnSubmit">📝 NỘP BÀI</button>
+  </div>
+</div>
+
+<script>
+var QUESTIONS_DATA = [
+  {"c":"1","q":"Công thức tính sức điện động E của động cơ DC kích từ độc lập là gì?","a":"E = Ke·Φ·n"},
+  {"c":"1","q":"Phương trình cân bằng điện áp của động cơ DC ở chế độ động cơ (motoring) là:","a":"V = E + Ia·Ra"},
+  {"c":"1","q":"Công thức tính Ke·Φ từ thông số định mức của động cơ DC?","a":"Ke·Φ = (Vn - In·Ra) / nn"},
+  {"c":"1","q":"Mối quan hệ giữa Ke·Φ và Kt·Φ trong động cơ DC?","a":"Kt·Φ = (60/2π) × Ke·Φ ≈ 9.55 × Ke·Φ"},
+  {"c":"1","q":"Khi từ thông Φ không đổi, moment T của động cơ DC tỉ lệ với:","a":"Dòng điện phần ứng Ia"},
+  {"c":"1","q":"Công thức tính moment định mức Tn của động cơ DC?","a":"Tn = Kt·Φ × In"},
+  {"c":"1","q":"Để tính dòng điện tải Ia_load khi biết Tload = k·Tn, công thức là:","a":"Ia_load = k × In"},
+  {"c":"1","q":"Đơn vị của Ke·Φ khi n tính bằng rpm và E tính bằng V là:","a":"V/rpm"},
+  {"c":"2","q":"Công thức điện áp DC trung bình ngõ ra của bộ chỉnh lưu cầu 1 pha điều khiển toàn phần?","a":"Vdc = (2√2·Vs/π) × cos(α)"},
+  {"c":"2","q":"Điện áp DC cực đại của bộ chỉnh lưu cầu 1 pha (α = 0°) xấp xỉ bằng:","a":"0.9 × Vs"},
+  {"c":"2","q":"Khi góc kích α > 90°, bộ chỉnh lưu cầu 1 pha hoạt động ở chế độ:","a":"Nghịch lưu (inverter), trả năng lượng về lưới"},
+  {"c":"2","q":"Để tính góc kích α của bộ chỉnh lưu từ điện áp Vdc, công thức là:","a":"α = arccos(Vdc × π / (2√2·Vs))"},
+  {"c":"2","q":"Khi tăng góc kích α, điện áp ngõ ra Vdc của bộ chỉnh lưu cầu sẽ:","a":"Giảm"},
+  {"c":"2","q":"Trong bộ chỉnh lưu cầu 1 pha điều khiển toàn phần, góc kích α có thể thay đổi từ:","a":"0° đến 180°"},
+  {"c":"3","q":"Công thức tính điện áp ngõ ra của bộ chopper (băm áp) ở chế độ xung?","a":"Vout = D × Vs"},
+  {"c":"3","q":"Duty cycle D của bộ chopper được định nghĩa là:","a":"D = ton / T (T = 1/fsw)"},
+  {"c":"3","q":"Chopper Class C là bộ băm áp hoạt động ở:","a":"2 góc phần tư (Q1 và Q4)"},
+  {"c":"3","q":"Chopper Class A là bộ băm áp hoạt động ở:","a":"1 góc phần tư (Q1) - chỉ giảm áp"},
+  {"c":"3","q":"Công thức tính độ dợn sóng dòng điện ΔI trong bộ chopper?","a":"ΔI = Vs·D·(1-D) / (fsw·La)"},
+  {"c":"3","q":"Độ dợn sóng dòng điện ΔI lớn nhất khi D (duty cycle) bằng:","a":"D = 0.5"},
+  {"c":"3","q":"Tần số băm fsw của chopper càng cao thì độ dợn sóng dòng điện:","a":"Càng nhỏ"},
+  {"c":"3","q":"Khi D = 0.6 và Vs = 220V, điện áp ngõ ra bộ chopper là:","a":"132 V"},
+  {"c":"3","q":"Chopper Class E là bộ băm áp hoạt động ở:","a":"4 góc phần tư"},
+  {"c":"4","q":"Khi động cơ DC đang quay, nếu giảm điện áp V xuống thấp hơn sức điện động E, động cơ sẽ:","a":"Hãm tái sinh (regenerative braking)"},
+  {"c":"4","q":"Trong quá trình hãm tái sinh, công thức tính dòng điện phần ứng là:","a":"Ia = (E - V) / Ra"},
+  {"c":"4","q":"Trong hãm tái sinh, động cơ hoạt động như:","a":"Máy phát điện, trả năng lượng về nguồn"},
+  {"c":"4","q":"Điều kiện để xảy ra hãm tái sinh ở động cơ DC kích từ độc lập:","a":"E > V (sức điện động lớn hơn điện áp cấp)"},
+  {"c":"5","q":"Khi đảo chiều động cơ DC bằng tiếp điểm contactor, tại thời điểm bắt đầu đảo chiều:","a":"Điện áp V và sức điện động E cùng chiều, dòng điện rất lớn"},
+  {"c":"5","q":"Công thức tính dòng điện khởi điểm khi hãm ngược (đảo chiều) là:","a":"Ia = (V + E) / Ra"},
+  {"c":"5","q":"Tại sao cần thêm điện trở phụ Radd khi hãm ngược?","a":"Vì dòng điện khởi điểm quá lớn, có thể vượt 10-40 lần dòng định mức"},
+  {"c":"5","q":"Công thức tính Radd khi hãm ngược để giới hạn dòng điện ≤ k·In:","a":"Radd = (V + E) / (k·In) - Ra"},
+  {"c":"5","q":"Khi tốc độ động cơ bị triệt tiêu (n=0) trong quá trình đảo chiều, sức điện động E bằng:","a":"E = 0"},
+  {"c":"5","q":"Sau khi đảo chiều xong (có Radd), nếu chưa tách Radd, tốc độ động cơ sẽ:","a":"Thấp hơn tốc độ yêu cầu do sụt áp trên Radd"},
+  {"c":"6","q":"Khi tải Tload < Tn, dòng điện phần ứng Ia sẽ thế nào so với dòng định mức In?","a":"Ia < In (tỉ lệ thuận với moment tải)"},
+  {"c":"6","q":"Muốn động cơ DC chạy ở tốc độ thấp hơn tốc độ định mức, cần phải:","a":"Giảm điện áp phần ứng V"},
+  {"c":"6","q":"Muốn động cơ DC chạy ở tốc độ cao hơn tốc độ định mức, cần phải:","a":"Giảm từ thông Φ (giảm dòng kích từ)"},
+  {"c":"6","q":"Khi động cơ DC chạy ở tốc độ 0.5nn với cùng moment tải, điện áp V xấp xỉ:","a":"0.5 × E_định_mức + Ia·Ra"},
+  {"c":"6","q":"Hiệu suất của động cơ DC gần đúng bằng:","a":"E/V (tỉ số sức điện động / điện áp cấp)"},
+  {"c":"7","q":"Bộ chỉnh lưu cầu 1 pha có ưu điểm gì so với bộ chỉnh lưu tia?","a":"Điện áp ngõ ra lớn gấp đôi với cùng điện áp nguồn AC"},
+  {"c":"7","q":"Tần số gợn sóng điện áp ngõ ra của bộ chỉnh lưu cầu 1 pha so với tần số nguồn AC là:","a":"Gấp 2 lần tần số nguồn (100Hz với nguồn 50Hz)"},
+  {"c":"7","q":"Một động cơ DC có Vn=220V, In=100A, Ra=0.1Ω. Tính sức điện động định mức En.","a":"En = 220 - 100×0.1 = 210V"},
+  {"c":"7","q":"Động cơ DC có Vn=200V, In=100A, Ra=0.05Ω, nn=2000rpm. Ke·Φ = ?","a":"Ke·Φ = (200-5)/2000 = 0.0975 V/rpm"},
+  {"c":"7","q":"Động cơ DC có Ke·Φ=0.1 V/rpm. Ở tốc độ 1000 rpm, sức điện động E bằng:","a":"E = 0.1 × 1000 = 100V"},
+  {"c":"7","q":"Động cơ DC cần V=110V để chạy ở 1000rpm với Ia=75A, Ra=0.05Ω. Tính E ở 1000rpm.","a":"E = 110 - 75×0.05 = 106.25V"},
+  {"c":"8","q":"Khi tăng tần số băm fsw của chopper, tổn hao chuyển mạch sẽ:","a":"Tăng lên"},
+  {"c":"8","q":"Trong chopper Class C, khi D > E/Vs, động cơ hoạt động ở chế độ:","a":"Động cơ (motoring)"},
+  {"c":"8","q":"Trong phương pháp điều khiển V/f cho động cơ, tốc độ động cơ tỉ lệ với:","a":"Tần số nguồn cấp"},
+  {"c":"8","q":"Bộ chỉnh lưu cầu 1 pha bán điều khiển (half-controlled) khác với điều khiển toàn phần ở chỗ:","a":"Có 2 SCR và 2 diode (thay vì 4 SCR)"},
+  {"c":"8","q":"Trong mạch chopper, diode flyback có tác dụng:","a":"Duy trì dòng điện qua tải khi khóa (switch) ngắt"},
+  {"c":"8","q":"Để bảo vệ quá dòng cho động cơ DC, giới hạn dòng thường được đặt ở mức:","a":"1.5 - 2 lần dòng định mức"}
+];
+
+var TOTAL_Q = 40;
+var questions = [];
+var options = [];
+var answers = {};
+var timeLeft = 2700;
+var timerId = null;
+var submitted = false;
+
+function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+function loadQuestions() {
+  document.getElementById('btnStart').textContent = 'ĐANG TẢI...';
+  document.getElementById('btnStart').disabled = true;
+  questions = shuffle(QUESTIONS_DATA).slice(0, TOTAL_Q);
+  buildOptions();
+  startQuiz();
+}
+
+function buildOptions() {
+  var allAnswers = questions.map(function(q) { return q.a; });
+  options = questions.map(function(q) {
+    var others = allAnswers.filter(function(a) { return a !== q.a; });
+    var distractors = shuffle(others).slice(0, 3);
+    return shuffle([q.a].concat(distractors));
+  });
+}
+
+function startQuiz() {
+  answers = {};
+  submitted = false;
+  timeLeft = 2700;
+  document.getElementById('pageIntro').classList.add('hidden');
+  document.getElementById('pageQuiz').classList.remove('hidden');
+  document.getElementById('btnSubmit').disabled = false;
+  document.getElementById('btnSubmit').textContent = '📝 NỘP BÀI';
+  document.getElementById('lblTime').style.color = '';
+  var oldBanner = document.getElementById('resultBanner');
+  if (oldBanner) oldBanner.parentNode.removeChild(oldBanner);
+  document.getElementById('bottomBar').innerHTML = '<button id="btnSubmit">📝 NỘP BÀI</button>';
+  var bsu = document.getElementById('btnSubmit');
+  bsu.addEventListener('click', function(e) { e.preventDefault(); doSubmit(); });
+  bsu.addEventListener('touchend', function(e) { e.preventDefault(); doSubmit(); });
+  renderNav();
+  renderQuestions();
+  updateStatus();
+  startTimer();
+  window.scrollTo(0, 0);
+}
+
+function renderNav() {
+  var html = '';
+  for (var i = 0; i < questions.length; i++) {
+    html += '<div class="nav-dot" data-nav="' + i + '">' + (i + 1) + '</div>';
+  }
+  document.getElementById('navStrip').innerHTML = html;
+}
+
+function renderQuestions() {
+  var html = '';
+  var letters = ['A', 'B', 'C', 'D'];
+  for (var i = 0; i < questions.length; i++) {
+    var q = questions[i];
+    var opts = options[i];
+    html += '<div class="q-card" id="card' + i + '">';
+    html += '<div class="q-num">Câu ' + (i + 1) + ' (Nhóm ' + q.c + ')</div>';
+    html += '<div class="q-text">' + q.q + '</div>';
+    for (var j = 0; j < opts.length; j++) {
+      html += '<div class="opt" data-qi="' + i + '" data-oi="' + j + '" id="opt' + i + '_' + j + '">';
+      html += '<span class="letter">' + letters[j] + '</span>';
+      html += '<span>' + opts[j] + '</span>';
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+  document.getElementById('qList').innerHTML = html;
+}
+
+document.getElementById('qList').addEventListener('click', function(e) {
+  if (submitted) return;
+  var el = e.target;
+  while (el && el !== this) {
+    if (el.classList && el.classList.contains('opt')) {
+      var qi = parseInt(el.getAttribute('data-qi'));
+      var oi = parseInt(el.getAttribute('data-oi'));
+      if (!isNaN(qi) && !isNaN(oi)) setAnswer(qi, oi);
+      return;
+    }
+    el = el.parentNode;
+  }
+});
+
+document.getElementById('navStrip').addEventListener('click', function(e) {
+  var el = e.target;
+  while (el && el !== this) {
+    if (el.classList && el.classList.contains('nav-dot')) {
+      var idx = parseInt(el.getAttribute('data-nav'));
+      if (!isNaN(idx)) {
+        var card = document.getElementById('card' + idx);
+        if (card) card.scrollIntoView({behavior:'smooth',block:'center'});
+      }
+      return;
+    }
+    el = el.parentNode;
+  }
+});
+
+function setAnswer(qi, oi) {
+  answers[qi] = oi;
+  var card = document.getElementById('card' + qi);
+  var opts = card.querySelectorAll('.opt');
+  for (var i = 0; i < opts.length; i++) {
+    opts[i].classList.remove('chosen');
+  }
+  var chosen = document.getElementById('opt' + qi + '_' + oi);
+  if (chosen) chosen.classList.add('chosen');
+  var dots = document.getElementById('navStrip').querySelectorAll('.nav-dot');
+  if (dots[qi]) dots[qi].classList.add('done');
+  updateStatus();
+}
+
+function updateStatus() {
+  var count = Object.keys(answers).length;
+  var pct = (count / questions.length) * 100;
+  document.getElementById('lblCount').textContent = 'Đã làm: ' + count + '/' + questions.length;
+  document.getElementById('barFill').style.width = pct + '%';
+}
+
+function startTimer() {
+  updateTimer();
+  if (timerId) clearInterval(timerId);
+  timerId = setInterval(function() {
+    timeLeft--;
+    updateTimer();
+    if (timeLeft <= 0) { clearInterval(timerId); doSubmit(); }
+  }, 1000);
+}
+
+function updateTimer() {
+  var m = Math.floor(timeLeft / 60);
+  var s = timeLeft % 60;
+  document.getElementById('lblTime').textContent = '⏱ ' + m + ':' + (s < 10 ? '0' : '') + s;
+  if (timeLeft < 300) document.getElementById('lblTime').style.color = '#c62828';
+}
+
+function doSubmit() {
+  if (submitted) return;
+  var unanswered = questions.length - Object.keys(answers).length;
+  if (unanswered > 0 && timeLeft > 0) {
+    if (!confirm('Bạn còn ' + unanswered + ' câu chưa trả lời. Nộp bài?')) return;
+  }
+  submitted = true;
+  if (timerId) clearInterval(timerId);
+
+  var correct = 0;
+
+  for (var i = 0; i < questions.length; i++) {
+    var q = questions[i];
+    var userOi = answers[i];
+    var userAns = userOi !== undefined ? options[i][userOi] : '(Chưa trả lời)';
+    var isOk = userAns === q.a;
+    if (isOk) correct++;
+
+    var card = document.getElementById('card' + i);
+    var opts = card.querySelectorAll('.opt');
+    for (var j = 0; j < opts.length; j++) {
+      if (options[i][j] === q.a) opts[j].classList.add('right');
+      if (j === userOi && !isOk) opts[j].classList.add('wrong');
+    }
+
+    if (userAns === '(Chưa trả lời)') {
+      card.classList.add('empty-card');
+    } else if (isOk) {
+      card.classList.add('correct-card');
+    } else {
+      card.classList.add('wrong-card');
+    }
+
+    var explDiv = document.createElement('div');
+    explDiv.className = 'explain';
+    var explHTML = '';
+    if (userAns === '(Chưa trả lời)') {
+      explDiv.classList.add('miss');
+      explHTML += '<div class="exp-line exp-miss">⚠ Bạn chưa chọn đáp án</div>';
+    } else if (isOk) {
+      explDiv.classList.add('ok');
+      explHTML += '<div class="exp-line exp-ok">✅ Đúng!</div>';
+    } else {
+      explDiv.classList.add('bad');
+      explHTML += '<div class="exp-line exp-bad">❌ Bạn chọn: ' + userAns + '</div>';
+    }
+    explHTML += '<div class="exp-line exp-correct">✓ Đáp án đúng: ' + q.a + '</div>';
+    explDiv.innerHTML = explHTML;
+    card.appendChild(explDiv);
+  }
+
+  document.getElementById('btnSubmit').disabled = true;
+  document.getElementById('btnSubmit').textContent = '✅ ĐÃ NỘP';
+  showResult(correct);
+}
+
+function showResult(correct) {
+  var passed = correct >= 28;
+
+  var bannerHTML = '<div class="result-banner" id="resultBanner">';
+  bannerHTML += '<div class="score-circle ' + (passed ? 'ok' : 'not') + '">';
+  bannerHTML += '<span class="score-num">' + correct + '/' + questions.length + '</span>';
+  bannerHTML += '<span class="score-tag">' + (passed ? 'QUA MÔN' : 'TRƯỢT') + '</span>';
+  bannerHTML += '</div>';
+  bannerHTML += '<h3 style="font-size:22px;text-transform:uppercase;letter-spacing:1px">' + (passed ? 'QUA MÔN' : 'BẠN ĐÃ TRƯỢT MÔN NÀY') + '</h3>';
+  bannerHTML += '<div class="stat-row">';
+  bannerHTML += '<div class="stat"><div class="val green">' + correct + '</div><div class="lbl">Đúng</div></div>';
+  bannerHTML += '<div class="stat"><div class="val red">' + (Object.keys(answers).length - correct) + '</div><div class="lbl">Sai</div></div>';
+  bannerHTML += '<div class="stat"><div class="val" style="color:#e65100">' + (questions.length - Object.keys(answers).length) + '</div><div class="lbl">Chưa chọn</div></div>';
+  bannerHTML += '<div class="stat"><div class="val">' + questions.length + '</div><div class="lbl">Tổng</div></div>';
+  bannerHTML += '</div></div>';
+
+  var qList = document.getElementById('qList');
+  var temp = document.createElement('div');
+  temp.innerHTML = bannerHTML;
+  qList.parentNode.insertBefore(temp.firstChild, qList);
+
+  document.getElementById('bottomBar').innerHTML =
+    '<div class="btn-row">' +
+    '<button class="btn-red" id="btnRetake2">🔄 LÀM LẠI</button>' +
+    '<button class="btn-out" id="btnPrint2">🖨 IN</button>' +
+    '</div>';
+
+  document.getElementById('btnRetake2').addEventListener('click', loadQuestions);
+  document.getElementById('btnRetake2').addEventListener('touchend', function(e){ e.preventDefault(); loadQuestions(); });
+  document.getElementById('btnPrint2').addEventListener('click', function(){ window.print(); });
+  document.getElementById('btnPrint2').addEventListener('touchend', function(e){ e.preventDefault(); window.print(); });
+
+  window.scrollTo(0, 0);
+}
+
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+    document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+    this.classList.add('active');
+    document.getElementById(this.getAttribute('data-tab')).classList.add('active');
+  });
+});
+
+// Button handlers
+function bindEvents() {
+  var bs = document.getElementById('btnStart');
+  var bsu = document.getElementById('btnSubmit');
+  if (!bs || !bsu) { setTimeout(bindEvents, 50); return; }
+
+  bs.addEventListener('click', function(e) { e.preventDefault(); loadQuestions(); });
+  bs.addEventListener('touchend', function(e) { e.preventDefault(); loadQuestions(); });
+
+  bsu.addEventListener('click', function(e) { e.preventDefault(); doSubmit(); });
+  bsu.addEventListener('touchend', function(e) { e.preventDefault(); doSubmit(); });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bindEvents);
+} else {
+  bindEvents();
+}
+</script>
+</body>
+</html>
