@@ -150,7 +150,11 @@ body{
   .score-num{font-size:32px}
   .score-circle{width:100px;height:100px}
 }
-</style>
+
+.exp-line{font-size:13px;padding:3px 0;margin-top:4px}
+.exp-ok{color:#2e7d32}
+.exp-bad,.exp-miss{color:#c62828}
+.exp-correct{color:#2e7d32;font-weight:600}</style>
 </head>
 <body>
 
@@ -547,6 +551,20 @@ function doSubmit() {
       if (options[i][j] === q.a) opts[j].classList.add('right');
       if (j === userOi && !isOk) opts[j].classList.add('wrong');
     }
+        // Explanation below each question
+    var explDiv = document.createElement('div');
+    explDiv.className = 'explain';
+    var explHTML = '';
+    if (userAns === '(Chưa trả lời)') {
+      explHTML += '<div class="exp-line exp-miss">⚠ Bạn chưa chọn đáp án</div>';
+    } else if (isOk) {
+      explHTML += '<div class="exp-line exp-ok">✅ Bạn chọn: ' + userAns + '</div>';
+    } else {
+      explHTML += '<div class="exp-line exp-bad">❌ Bạn chọn: ' + userAns + '</div>';
+    }
+    explHTML += '<div class="exp-line exp-correct">✓ Đáp án đúng: ' + q.a + '</div>';
+    explDiv.innerHTML = explHTML;
+    card.appendChild(explDiv);
     review.push({chapter:q.c, question:q.q, correct:q.a, yours:userAns, ok:isOk});
   }
 
