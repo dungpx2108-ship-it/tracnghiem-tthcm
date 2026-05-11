@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Trắc Nghiệm Tư Tưởng Hồ Chí Minh - C4,5,6</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -627,15 +630,14 @@ function doSubmit() {
 
 function showResult(correct, review) {
   // Keep quiz page visible with inline result banner
-  var score = Math.round((correct / questions.length) * 100);
-  var passed = score >= 50;
+  var passed = correct >= 35;
 
   var bannerHTML = '<div class="result-banner" id="resultBanner">';
   bannerHTML += '<div class="score-circle ' + (passed ? 'ok' : 'not') + '">';
   bannerHTML += '<span class="score-num">' + correct + '/' + questions.length + '</span>';
-  bannerHTML += '<span class="score-tag">' + (passed ? 'ĐẠT' : 'CHƯA ĐẠT') + '</span>';
+  bannerHTML += '<span class="score-tag">' + (passed ? 'QUA MÔN' : 'TRƯỢT') + '</span>';
   bannerHTML += '</div>';
-  bannerHTML += '<h3>' + (passed ? '🎉 Chúc mừng! Bạn đã hoàn thành bài thi.' : '💪 Cố gắng hơn vào lần sau!') + '</h3>';
+  bannerHTML += '<h3 style="font-size:22px;text-transform:uppercase;letter-spacing:1px">' + (passed ? 'QUA MÔN' : 'BẠN ĐÃ TRƯỢT MÔN NÀY') + '</h3>';
   bannerHTML += '<div class="stat-row">';
   bannerHTML += '<div class="stat"><div class="val green">' + correct + '</div><div class="lbl">Đúng</div></div>';
   bannerHTML += '<div class="stat"><div class="val red">' + (Object.keys(answers).length - correct) + '</div><div class="lbl">Sai</div></div>';
