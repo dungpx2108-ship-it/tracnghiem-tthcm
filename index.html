@@ -207,7 +207,7 @@ body{
         <li>Xem lại chi tiết từng câu đúng/sai</li>
       </ul>
     </div>
-    <button type="button" class="big-btn" id="btnStart">BẮT ĐẦU LÀM BÀI</button>
+    <button type="button" class="big-btn" id="btnStart" onclick="loadQuestions()">BẮT ĐẦU LÀM BÀI</button>
   </div>
 </div>
 
@@ -682,24 +682,23 @@ function showResult(correct, review) {
 }
 
 // ---- BUTTON HANDLERS ----
+function bindEvent(el, fn) {
+  if (!el) return;
+  el.addEventListener('click', function(e) { e.preventDefault(); fn(e); });
+  el.addEventListener('touchend', function(e) { e.preventDefault(); fn(e); });
+}
+
+function bindWhenReady(id, fn) {
+  var el = document.getElementById(id);
+  if (el) { bindEvent(el, fn); return; }
+  setTimeout(function() { bindWhenReady(id, fn); }, 50);
+}
+
 function bindEvents() {
-  var bs = document.getElementById('btnStart');
-  var bsu = document.getElementById('btnSubmit');
-  var br = document.getElementById('btnRetake');
-  var bp = document.getElementById('btnPrint');
-  if (!bs || !bsu || !br || !bp) { setTimeout(bindEvents, 50); return; }
-
-  bs.addEventListener('click', function(e) { e.preventDefault(); loadQuestions(); });
-  bs.addEventListener('touchend', function(e) { e.preventDefault(); loadQuestions(); });
-
-  bsu.addEventListener('click', function(e) { e.preventDefault(); doSubmit(); });
-  bsu.addEventListener('touchend', function(e) { e.preventDefault(); doSubmit(); });
-
-  br.addEventListener('click', function(e) { e.preventDefault(); loadQuestions(); });
-  br.addEventListener('touchend', function(e) { e.preventDefault(); loadQuestions(); });
-
-  bp.addEventListener('click', function(e) { e.preventDefault(); window.print(); });
-  bp.addEventListener('touchend', function(e) { e.preventDefault(); window.print(); });
+  bindWhenReady('btnStart', loadQuestions);
+  bindWhenReady('btnSubmit', doSubmit);
+  bindWhenReady('btnRetake', loadQuestions);
+  bindWhenReady('btnPrint', function() { window.print(); });
 }
 
 if (document.readyState === 'loading') {
